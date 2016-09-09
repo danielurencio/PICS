@@ -1,0 +1,88 @@
+::-webkit-scrollbar {
+    width: 12px;
+}
+ 
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 10px;
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+
+@font-face {
+    font-family: ahellyaitalic;
+    src: url("../fonts/ahellya italic.ttf");
+}
+
+@font-face {
+    font-family: ahellya;
+    src: url("../fonts/ahellya.ttf");
+}
+
+
+@font-face {
+    font-family: lane;
+    src: url("../fonts/LANENAR_.ttf");
+}
+
+
+@font-face {
+    font-family: HelveticaNeue;
+    src: url("../fonts/HelveticaNeueLTStd Lt.otf");
+}
+
+div {
+    margin: auto;
+    display: block;
+    width: 600px;
+}
+
+span {
+    color: rgb(18,173,42);
+    font-family: ahellyaitalic;
+}
+
+mark {
+    background-color: rgba(0,0,0,.8);
+    color: white;
+}
+
+#t {
+    font-family: ahellya;
+    margin-top: 40px;
+    font-size: 40px;
+    text-align: center
+}
+
+#st {
+    font-family: lane;
+    margin-top: 40px;
+    font-size: 30px;
+}
+
+#p {
+    margin-top: 20px;
+    font-family: HelveticaNeue;
+    font-size: 15px;
+    text-align: justify;
+    line-height: 135%
+}
+
+#code {
+    font-family: "Courier New",Courier,monospace;
+    font-size: 15px;
+    font-weight: bold;
+    color: rgb(18,173,42);
+    margin-top: 40px;
+    margin-bottom: 40px;
+    margin-right: 300px;
+    
+}
+
+a:link    {color:rgb(99,209,62); background-color:transparent; text-decoration:none}
+a:visited {color:rgb(99,209,62); background-color:transparent; text-decoration:none}
+a:hover   {color:rgb(99,209,62); background-color:transparent; text-decoration:none}
+a:active  {color:rgb(99,209,62); background-color:transparent; text-decoration:none}

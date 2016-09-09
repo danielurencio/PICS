@@ -1,0 +1,9 @@
+html, body {
+  margin:0px;
+  background-color:black;
+}
+
+@font-face {
+  font-family:BLTFRU;
+  src:url("../fonts/BLTFRU.TTF");
+}

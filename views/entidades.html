@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+  <link rel="stylesheet" type="text/css" href="public/css/entidades.css">
+</head>
+<body>
+<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="//d3js.org/topojson.v1.min.js"></script>
+<script charset="utf-8">
+
+/* JavaScript goes here. */
+
+var width = window.innerWidth,
+    height = window.innerHeight;
+
+var svg = d3.select("body").append("svg")
+     .attr("width", width)
+     .attr("height", height)
+     .style({
+	"margin": "auto",
+	"display": "block"
+     });
+
+var gg = svg.append("g")
+
+var projection = d3.geo.mercator();
+
+var path = d3.geo.path().projection(projection);
+
+d3.json("entidadesJSON", function(err,mx) {
+  var key = Object.keys(mx.objects)[0];
+  console.log(key);
+
+  var entidades = topojson.feature(mx, mx.objects[key]);
+
+  projection.scale(1).translate([0,0]);
+
+  var b = path.bounds(entidades);
+  var s = 0.95 / Math.max((b[1][0]-b[0][0]) / width, (b[1][1] - b[0][1]) / height);
+  var t = [(width-s*(b[1][0]+b[0][0]))/2, (height-s*(b[1][1]+b[0][1]))/2];
+
+  projection.scale(s).translate(t);
+
+  gg.selectAll("path")
+    .data(entidades.features)
+    .enter().append("path")
+    .attr({
+      "class": function(d) { return d.NOM_ENT; },
+      "d": path,
+      "fill": "transparent"
+    })
+    .style({
+      "stroke": "white",
+      "stroke-width": "0.33px"
+    })
+    .on("mouseover", function(d) {
+	d3.select(this)
+	.attr("fill","rgb(216,39,53)")
+	.style("stroke-width", "1.5px");
+
+	d3.select("svg").append("text")
+	  .attr({
+	    "x": width/9,
+	    "y": height - height/6,
+	    "font-family":"BLTFRU",
+	    "font-size":"50px"
+	  })
+	  .style("fill", "white")
+	  .text(function() { return d.properties.NOM_ENT; });
+    })
+    .on("mouseout", function(d) {
+        d3.select(this)
+	.attr("fill","transparent")
+	.style("stroke-width", "0.25px");
+	
+	d3.selectAll("text").remove();
+    })
+    .on("click", function(d) {
+	var cve = d.properties.CVE_ENT;
+
+	d3.xhr("/data")
+	  .header("Content-Type", "application/json")
+	  .post(JSON.stringify({ cve:cve }), function(err, data) {
+		console.log(data);
+
+	  //window.location = "/" + cve;
+	    d3.selectAll("g").remove();
+
+	    d3.json(String(cve), function(err,est) {
+	      var estKey = Object.keys(est.objects)[0];
+	      var municipios = topojson.feature(est, est.objects[estKey]);
+	      console.log(est);
+
+	      projection.scale(1).translate([0,0]);
+
+	      var b = path.bounds(municipios);
+	      var s = 0.95 / Math.max((b[1][0]-b[0][0]) / width, (b[1][1] - b[0][1]) / height);
+	      var t = [(width-s*(b[1][0]+b[0][0]))/2, (height-s*(b[1][1]+b[0][1]))/2];
+
+	      projection.scale(s).translate(t);
+
+	      svg.selectAll("path")
+	        .data(municipios.features)
+	        .enter().append("path")
+	        .attr({
+	          "class": function(d) { return d.NOMGEO; },
+	          "d": path,
+	          "fill": "transparent"
+	        })
+	        .style({
+	          "stroke": "white",
+	          "stroke-width": "0.33px"
+	        })
+
+	    })
+
+	  });
+
+
+    });
+
+});
+
+</script>
