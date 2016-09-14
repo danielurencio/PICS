@@ -22,10 +22,12 @@ function setIDMunicipio() {
 function denueJSON() {
   var files = fs.readdirSync("./denue/json");
 
-  files.forEach(function(d) {
+  files.forEach(function(d,i) {
     if(d!="no") {
-      var f = require("./denue/json/" + d);
-      console.log(f.features.length);
+     var file = require("./denue/json/" + d);
+     file = file.features;
+     fs.writeFileSync("./denue/json/" + i + ".json", JSON.stringify(file));
+      console.log(i);
     }
   });
 
