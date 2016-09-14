@@ -14,23 +14,23 @@ function denueDescarga {
   Guerrero
   Hidalgo
   Jalisco
-  Mexico
-  Michoacan_de_Ocampo
+  México
+  Michoacán_de_Ocampo
   Morelos
   Nayarit
-  Nuevo_Leon
+  Nuevo_León
   Oaxaca
   Puebla
-  Queretaro
+  Querétaro
   Quintana_Roo
-  San_Luis_Potosi
+  San_Luis_Potosí
   Sinaloa
   Sonora
   Tabasco
   Tamaulipas
   Tlaxcala
   Veracruz_de_Ignacio_de_la_Llave
-  Yucatan
+  Yucatán
   Zacatecas)
 
  mkdir denue
@@ -52,9 +52,10 @@ denueOrdenar() {
    cd $dir
 
    for j in *; do
-    if [ ! -d $j ]; then
+    if [[ ! -d $j && ! -f ../${dir}.json ]]; then
      ogr2ogr -t_srs EPSG:4326 -f GeoJSON ../${dir}.json DENUE_INEGI_${dir}_.shp
-    else
+    fi
+    if [ -d $j ]; then
      ogr2ogr -t_srs EPSG:4326 -f GeoJSON ../${dir}.json ${j}/DENUE_INEGI_${dir}_.shp
     fi
    done
@@ -63,4 +64,13 @@ denueOrdenar() {
   done
 
   mkdir json; mv *.json json
+  cd json;
+
+  for i in *; do
+    iconv -f ISO-8859-1 -t utf-8 ${i%.*}.json > ${i%.*}_utf8.json;
+  done
+
+  mkdir no; mv ??.json no;
+
+  cd ../
 }
