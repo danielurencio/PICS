@@ -90,4 +90,15 @@ denueOrdenarCSV() {
   done
 
   rm D*.csv
+  cd ../
+}
+
+importCSVtoMongo()  {
+  cd denue;
+
+  for i in *.csv; do
+    mongoimport --file ${i} -d PICS -c denue --headerline --type=csv
+  done
+
+  cd ../
 }

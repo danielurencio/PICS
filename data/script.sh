@@ -94,10 +94,10 @@ function transformar {
   cd entidades;
 
   categories=(
-   #mun
-   #l
-   #m
-   e
+   mun
+   l
+   m
+   #e
   )
 
   for c in ${categories[@]}; do
