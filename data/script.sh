@@ -89,21 +89,50 @@ function transformar {
   cd entidades;
 
   categories=(
-   mun
+   #mun
    l
-   m
+   #m
    #e
   )
 
   for c in ${categories[@]}; do
-    mkdir $c
+    mkdir $c;
     for d in */; do
       ogr2ogr -t_srs EPSG:4326 -f GeoJSON \
 ${c}/${d::-1}_${c}.json ${d}conjunto_de_datos/${c}/*.shp;
-      topojson -o ${c}/${d::-1}_${c}_t.json ${c}/${d::-1}_${c}.json;
+      topojson -o ${c}/${d::-1}_${c}_t.json ${c}/${d::-1}_${c}.json -p;
     done
+    mkdir ${c}/${c}_t;
+    mv ${c}/*_t.json ${c}/${c}_t;
   done
 
+  # node ../script.js ${c};
   echo "Finito.."
 }
 
+SUN() {
+  mkdir SUN;
+  # Descarga de base de datos del SUN desde el sitio de la CONAPO.
+  curl -o SUN/base.xlsx http://www.conapo.gob.mx/work/models/CONAPO/Resource/1212/1/images/BaseDatosCompleta_Indicadores_SUN.xlsx;
+
+ # Convertir cada una de las pestañas del excel a un archivo formato "CSV".
+  for k in 1 2 3 4 5 6 7 8; do
+    xlsx2csv SUN/base.xlsx -s $k > SUN/$k.csv;
+  done
+
+# Borrar las líneas en blanco.
+  for h in 1 4 5 6; do
+    sed -i 1,2d SUN/$h.csv; sed -i 2,3d SUN/$h.csv
+  done
+
+# Borrar las líneas en blanco.
+  for j in 2 3 7 8; do
+    sed -i 1,3d SUN/$j.csv; sed -i 2,3d SUN/$j.csv
+  done
+
+# Borrar la suma de totales para los archivos 7 y 8.
+  sed -i 386,388d SUN/7.csv
+  sed -i 386d SUN/8.csv
+
+#  sed -i 369,370 SUN/1.csv
+}

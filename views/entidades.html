@@ -78,7 +78,7 @@ d3.json("entidadesJSON", function(err,mx) {
     .on("click", function(d) {
 	var cve = d.properties.CVE_ENT;
 
-	d3.xhr("/data")
+	d3.xhr("/entidades")
 	  .header("Content-Type", "application/json")
 	  .post(JSON.stringify({ cve:cve }), function(err, data) {
 		console.log(data);
@@ -89,7 +89,7 @@ d3.json("entidadesJSON", function(err,mx) {
 	    d3.json(String(cve), function(err,est) {
 	      var estKey = Object.keys(est.objects)[0];
 	      var municipios = topojson.feature(est, est.objects[estKey]);
-	      console.log(est);
+//	      console.log(est);
 
 	      projection.scale(1).translate([0,0]);
 
@@ -111,6 +111,9 @@ d3.json("entidadesJSON", function(err,mx) {
 	          "stroke": "white",
 	          "stroke-width": "0.33px"
 	        })
+		.on("mouseover", function(d) {
+		  console.log(d)
+		});
 
 	    })
 

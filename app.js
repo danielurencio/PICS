@@ -17,11 +17,11 @@ app.use(bodyParser.json());
 MongoClient.connect("mongodb://localhost:27017/PICS", function(err,db) {
 
 ////// A MUNICIPIOS!!! <---- Esto consulta la cartografía municipal
-  app.post("/data", function(req,res) {
+  app.post("/entidades", function(req,res) {
     var id = req.body.cve; console.log(id);
     var query = db.collection("municipios").find({ "_id":id });
     var array = [];
-    query.stream().on("data", function(d) { array.push(d); });
+    query.stream().on("data", function(d) { array.push(d);});
     res.send("p"); // < -- ¿Por qué FUNCIONA esto?
     app.get("/" + id, function(req,ress) { ress.json(array[0]); });
   });
