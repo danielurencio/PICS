@@ -1,3 +1,8 @@
+SUN/8.csv: entidades/mun
+	bash -c "source ./script.sh; \
+	for var in \$$(compgen -v); do export \$$var; done; \
+	SUN; cotejar;"
+
 entidades/mun: entidades/Zacatecas/conjunto_de_datos/sip
 	bash -c "source ./script.sh; \
 	for var in \$$(compgen -v); do export \$$var; done; \

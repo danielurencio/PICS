@@ -56,7 +56,7 @@ function SUN(n) {
 	'unidadLength': 8
       };
     };
-
+      console.log(obj)
       cotejar(obj)
 
       function cotejar(o) {

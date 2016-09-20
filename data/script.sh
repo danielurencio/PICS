@@ -80,34 +80,37 @@ ordenar() {
 	done
 
   done
-
+  cd ..
 #  cd municipios; mkdir exports; cd ../../;
 #  node script.js; 
 }
 
 function transformar {
-  cd entidades;
+#  cd entidades;
 
   categories=(
-   #mun
+   mun
    l
    #m
    #e
   )
 
   for c in ${categories[@]}; do
-    mkdir $c;
-    for d in */; do
+    mkdir entidades/${c};
+
+    for d in entidades/*/; do
+      ent=$(echo ${d} | cut -d '/' -f 2)
       ogr2ogr -t_srs EPSG:4326 -f GeoJSON \
-${c}/${d::-1}_${c}.json ${d}conjunto_de_datos/${c}/*.shp;
-      topojson -o ${c}/${d::-1}_${c}_t.json ${c}/${d::-1}_${c}.json -p;
+entidades/${c}/${ent}_${c}.json ${d}conjunto_de_datos/${c}/*.shp;
+      topojson -o entidades/${c}/${ent}_${c}_t.json entidades/${c}/${ent}_${c}.json -p;
     done
-    mkdir ${c}/${c}_t;
-    mv ${c}/*_t.json ${c}/${c}_t;
+
+    mkdir entidades/${c}/${c}_t;
+    mv entidades/${c}/*_t.json entidades/${c}/${c}_t;
+    node script.js ${c}; echo "node for ${c}";
   done
 
-  # node ../script.js ${c};
-  echo "Finito.."
+  echo "Finito........."
 }
 
 SUN() {
@@ -134,5 +137,15 @@ SUN() {
   sed -i 386,388d SUN/7.csv
   sed -i 386d SUN/8.csv
 
-#  sed -i 369,370 SUN/1.csv
+#  sed -i 369,370 SUN/1.csv 
+}
+
+cotejar() {
+  for d in entidades/*/; do
+    var=$(echo $d | cut -d '/' -f 2);
+    if [[ $var == l || $var == mun || $var == m || $var == e ]]; then
+      echo $var;
+      node script sun $var;
+    fi;
+  done
 }
