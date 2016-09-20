@@ -7,6 +7,10 @@ var flag = process.argv[3];
 
 function setID(input) {
   var files = fs.readdirSync("./entidades/" + input + "/" + input +"_t");
+
+  var bjSur = files[1];
+  files[1] = files[2];
+  files[2] = bjSur;
   var chiapas = files[4];
   files[4] = files[6];
   files[6] = chiapas;
@@ -28,33 +32,60 @@ function setID(input) {
 };
 
 function SUN(n) {
-//  console.log(n);
-  var files_mun = fs.readdirSync("./entidades/" + n + "/" + n + "_t");
+  if(!n) {
+    console.log("\n  ATENCIÓN: ¡¡Tienes que especificar algún 'flag'!!\n");
+  }
 
-  var zm = fs.readFileSync("./SUN/1.csv", "utf8")
-  zm = d3.csv.parse(zm);
+  else {
+    var files = fs.readdirSync("./entidades/" + n + "/" + n + "_t");
 
-  zm = zm.map(function(d) {
-    return {
-      'entidad':d['Clave de la entidad federativa'],
-      'municipio':d['Clave del municipio'],
-      'sun':d['Número de registro en el Sistema Urbano Nacional 2010']
+    if( n == "mun" ) {
+      var zm = fs.readFileSync("./SUN/1.csv", "utf8")
+      zm = d3.csv.parse(zm);
+
+      zm = zm.map(function(d) {
+        return {
+          'entidad':d['Clave de la entidad federativa'],
+          'municipio':d['Clave del municipio'],
+	  'ciudad': d['Nombre de la ciudad (zona metropolitana)'],
+          'cvesun':d['Número de registro en el Sistema Urbano Nacional 2010']
+        };
+      });
+
+      zm.forEach(function(d) {
+        if(d.entidad.length == 1) d.entidad = "0" + d.entidad;
+        if(d.municipio.length == 4) d.municipio = "0" + d.municipio;
+      });
+
+      files.forEach(function(d) {
+        if(d.length == 7) {
+	  var cveEnt = d.split('.')[0];
+          var file = require("./entidades/" + n + "/" + n + "_t/" + d);
+          var key = Object.keys(file.objects)[0];
+          var geometries = file.objects[key].geometries.length;
+
+	  var cities = zm.filter(function(d) { return d.entidad == cveEnt; });
+
+	  cities.forEach(function(i) {
+	    file.objects[key].geometries.forEach(function(j) {
+	      if( i.municipio == j.properties.CVEGEO ) {
+	        j.properties.ciudad = { 'nombre': i.ciudad, 'cve': i.cvesun };
+	      };
+	    });
+	  });
+
+	  var count = file.objects[key].geometries.filter(function(d) {
+	    return d.properties.ciudad;
+	  });
+
+	  fs.writeFileSync("./entidades/" + n + "/" + n + "_t/" + d, JSON.stringify(file));
+	  console.log("File " + d + " written!");
+        };
+
+      });
+
     };
-  });
-
-  zm.forEach(function(d) {
-    if(d.entidad.length == 1) d.entidad = "0" + d.entidad;
-  });
-
-  files_mun.forEach(function(d) {
-    if(d.length == 7) {
-      var file = require("./entidades/" + n + "/" + n + "_t/" + d);
-      var key = Object.keys(file.objects)[0];
-      var geometries = file.objects[key].geometries.length;
-      console.log(key, geometries);
-    };
-
-  });
+  }
 
 };
 
