@@ -40,51 +40,74 @@ function SUN(n) {
     var files = fs.readdirSync("./entidades/" + n + "/" + n + "_t");
 
     if( n == "mun" ) {
-      var zm = fs.readFileSync("./SUN/1.csv", "utf8")
-      zm = d3.csv.parse(zm);
-
-      zm = zm.map(function(d) {
-        return {
-          'entidad':d['Clave de la entidad federativa'],
-          'municipio':d['Clave del municipio'],
-	  'ciudad': d['Nombre de la ciudad (zona metropolitana)'],
-          'cvesun':d['Número de registro en el Sistema Urbano Nacional 2010']
-        };
-      });
-
-      zm.forEach(function(d) {
-        if(d.entidad.length == 1) d.entidad = "0" + d.entidad;
-        if(d.municipio.length == 4) d.municipio = "0" + d.municipio;
-      });
-
-      files.forEach(function(d) {
-        if(d.length == 7) {
-	  var cveEnt = d.split('.')[0];
-          var file = require("./entidades/" + n + "/" + n + "_t/" + d);
-          var key = Object.keys(file.objects)[0];
-          var geometries = file.objects[key].geometries.length;
-
-	  var cities = zm.filter(function(d) { return d.entidad == cveEnt; });
-
-	  cities.forEach(function(i) {
-	    file.objects[key].geometries.forEach(function(j) {
-	      if( i.municipio == j.properties.CVEGEO ) {
-	        j.properties.ciudad = { 'nombre': i.ciudad, 'cve': i.cvesun };
-	      };
-	    });
-	  });
-
-	  var count = file.objects[key].geometries.filter(function(d) {
-	    return d.properties.ciudad;
-	  });
-
-	  fs.writeFileSync("./entidades/" + n + "/" + n + "_t/" + d, JSON.stringify(file));
-	  console.log("File " + d + " written!");
-        };
-
-      });
-
+      var obj = {
+	'sunFile': '1',
+	'unidadType': 'Clave del municipio',
+	'cityClass': 'Nombre de la ciudad (zona metropolitana)',
+	'unidadLength': 4
+      };
     };
+
+    if( n == 'l' ) {
+      var obj = {
+        'sunFile': '3',
+	'unidadType': 'Clave de la localidad',
+	'cityClass': 'Nombre de la ciudad (conurbación)',
+	'unidadLength': 8
+      };
+    };
+
+      cotejar(obj)
+
+      function cotejar(o) {
+        var U = fs.readFileSync("./SUN/" + o.sunFile + ".csv", "utf8")
+        U = d3.csv.parse(U);
+
+        U = U.map(function(d) {
+          return {
+            'entidad':d['Clave de la entidad federativa'],
+            'unidad':d[o.unidadType],
+	    'ciudad': d[o.cityClass],
+            'cvesun':d['Número de registro en el Sistema Urbano Nacional 2010']
+          };
+        });
+
+        U.forEach(function(d) {
+          if(d.entidad.length == 1) d.entidad = "0" + d.entidad;
+          if(d.unidad.length == o.unidadLength) d.unidad = "0" + d.unidad; // cambiar '4' ??
+        });
+
+        files.forEach(function(d) {
+          if(d.length == 7) {
+	    var cveEnt = d.split('.')[0];
+            var file = require("./entidades/" + n + "/" + n + "_t/" + d);
+            var key = Object.keys(file.objects)[0];
+            var geometries = file.objects[key].geometries.length;
+
+	    var cities = U.filter(function(d) { return d.entidad == cveEnt; });
+
+	    cities.forEach(function(i) {
+	      file.objects[key].geometries.forEach(function(j) {
+	        if( i.unidad == j.properties.CVEGEO ) {
+	          j.properties.ciudad = { 'nombre': i.ciudad, 'cve': i.cvesun };
+	        };
+	      });
+	    });
+
+/*
+	    var count = file.objects[key].geometries.filter(function(d) {
+	      return d.properties.ciudad;
+	    });
+
+	    console.log(cveEnt, count.length);
+*/
+	    fs.writeFileSync("./entidades/" + n + "/" + n + "_t/" + d, JSON.stringify(file));
+	    console.log("File " + d + " written!");
+          };
+
+        });
+
+    }; ///
   }
 
 };
