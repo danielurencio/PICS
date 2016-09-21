@@ -113,7 +113,42 @@ function SUN(n) {
 };
 
 
+function SunJSON(p) {
+  var file = fs.readFileSync("./SUN/" + p + ".csv", "utf8");
+  var o = {};
+
+  file = d3.csv.parse(file);
+
+  if ( p == '1' ) {
+    o = {
+      'unidad':'Clave del municipio',
+      'nombresun':'Nombre de la ciudad (zona metropolitana)'
+    };
+  }
+
+  if ( p == '3' ) {
+    o = {
+      'unidad':'Clave de la localidad',
+      'nombresun':'Nombre de la ciudad (conurbación)'
+    };
+  }
+
+
+  file = file.map(function(d) {
+    return {
+      'cveun':d[o.unidad],
+      'cvesun':d['Número de registro en el Sistema Urbano Nacional 2010'],
+      'nombresun':d[o.nombresun]
+    }
+  });
+
+  fs.writeFileSync("./" + p + ".js", JSON.stringify(file));
+  
+};
+
+
 if( input && input == "mun" || input == "l" ) setID(input);
 if( input == "sun" ) SUN(flag);
+if( input == "sunFile") SunJSON(flag);
 
 process.exit();

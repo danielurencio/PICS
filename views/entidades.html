@@ -112,7 +112,11 @@ d3.json("entidadesJSON", function(err,mx) {
 	          "stroke-width": "0.33px"
 	        })
 		.on("mouseover", function(d) {
-		  console.log(d)
+		  d3.select(this)
+		    .attr("fill", "rgb(216,39,53)");
+		})
+		.on("mouseout", function(d) {
+		    .attr("fill", "transparent");
 		});
 
 	    })
