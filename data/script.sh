@@ -89,9 +89,9 @@ function transformar {
 #  cd entidades;
 
   categories=(
-   mun
-   l
-   #m
+   #mun
+   #l
+   m
    #e
   )
 
@@ -143,9 +143,28 @@ SUN() {
 cotejar() {
   for d in entidades/*/; do
     var=$(echo $d | cut -d '/' -f 2);
-    if [[ $var == l || $var == mun || $var == m || $var == e ]]; then
+    if [[
+	$var == l ||
+	$var == mun #||
+#	$var == m #||
+#	$var == e 
+	]]; then
+
       echo $var;
       node script sun $var;
     fi;
   done
+}
+
+manzanas() {
+  if [ -d entidades/m ]; then
+    for i in entidades/m/*; do
+      file=$(basename ${i});
+      var=$(echo ${file%.*});
+      if [[ ${var::-2} != m ]]; then
+        mkdir entidades/m/${var::-2};
+        node script manzanas ${var::-2}
+      fi
+    done
+  fi
 }

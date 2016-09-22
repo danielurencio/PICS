@@ -17,13 +17,23 @@ app.use(bodyParser.json());
 MongoClient.connect("mongodb://localhost:27017/PICS", function(err,db) {
 
 ////// A MUNICIPIOS!!! <---- Esto consulta la cartografía municipal
-  app.post("/entidades", function(req,res) {
-    var id = req.body.cve; console.log(id);
+  app.post("/municipios", function(req,res) {
+    var id = req.body.cve;
     var query = db.collection("municipios").find({ "_id":id });
     var array = [];
-    query.stream().on("data", function(d) { array.push(d);});
+    query.stream().on("data", function(d) { array.push(d); });
     res.send("p"); // < -- ¿Por qué FUNCIONA esto?
     app.get("/" + id, function(req,ress) { ress.json(array[0]); });
+  });
+
+  app.post("/localidades", function(req,res) {
+    var id = req.body.cve.ent; console.log(req.body)
+    var page = req.body.cve.mun;
+    var query = db.collection("localidades").find({ "_id":id });
+    var array = [];
+    query.stream().on("data", function(d) { array.push(d); });
+    res.send("");
+    app.get("/" + page, function(req,ress) { ress.json(array[0]); });
   });
 
   app.get("/entidadesJSON", function(req,res) {
@@ -34,28 +44,8 @@ MongoClient.connect("mongodb://localhost:27017/PICS", function(err,db) {
       query.stream().on("close", function() { db.close(); });
   });
 
-  app.get("/municipiosPuebla", function(req,res) {
-    var query = db.collection("municipios").find({})
-		.project({ "_id":0 });
 
-    query.stream().on("data", function(d) { return res.json(d); });
-  });
-
-  app.get("/localidades", function(req,res) {
-    var query = db.collection("localidades").find({})
-		.project({ "_id":0 });
-
-    query.stream().on("data", function(d) { return res.json(d); });
-  });
-
-  app.get("/manzanas", function(req,res) {
-    var query = db.collection("manzanas").find({})
-		.project({ "_id":0 });
-
-    query.stream().on("data", function(d) { return res.json(d); });
-  });
-
-  app.get("/manzanasss", function(req,res,next) {
+  app.get("/SUN", function(req,res,next) {
     var query = db.collection("sunList").find({})
 		.project({ "_id":0 });
 var arr = [];

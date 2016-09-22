@@ -78,25 +78,20 @@ d3.json("entidadesJSON", function(err,mx) {
     .on("click", function(d) {
 	var cve = d.properties.CVE_ENT;
 
-	d3.xhr("/entidades")
+	d3.xhr("/municipios")
 	  .header("Content-Type", "application/json")
 	  .post(JSON.stringify({ cve:cve }), function(err, data) {
-		console.log(data);
 
-	  //window.location = "/" + cve;
 	    d3.selectAll("g").remove();
 
 	    d3.json(String(cve), function(err,est) {
 	      var estKey = Object.keys(est.objects)[0];
 	      var municipios = topojson.feature(est, est.objects[estKey]);
-//	      console.log(est);
 
 	      projection.scale(1).translate([0,0]);
-
 	      var b = path.bounds(municipios);
 	      var s = 0.95 / Math.max((b[1][0]-b[0][0]) / width, (b[1][1] - b[0][1]) / height);
 	      var t = [(width-s*(b[1][0]+b[0][0]))/2, (height-s*(b[1][1]+b[0][1]))/2];
-
 	      projection.scale(s).translate(t);
 
 	      svg.selectAll("path")
@@ -105,7 +100,10 @@ d3.json("entidadesJSON", function(err,mx) {
 	        .attr({
 	          "class": function(d) { return d.NOMGEO; },
 	          "d": path,
-	          "fill": "transparent"
+	          "fill": function(d) {
+		    if (d.properties.ciudad) return "rgba(216,39,53,0.75)"
+		    else return "transparent"
+		  }
 	        })
 	        .style({
 	          "stroke": "white",
@@ -113,10 +111,70 @@ d3.json("entidadesJSON", function(err,mx) {
 	        })
 		.on("mouseover", function(d) {
 		  d3.select(this)
-		    .attr("fill", "rgb(216,39,53)");
+		    .attr("fill", "rgb(216,39,53)")
+		    .style("stroke-width", "1.5px");
 		})
 		.on("mouseout", function(d) {
-		    .attr("fill", "transparent");
+		  d3.select(this)
+		    .attr("fill", function(d) {
+		      if (d.properties.ciudad) return "rgba(216,39,53,0.75)";
+		      else return "transparent";
+		    })
+		    .style("stroke-width", "0.25px");
+		})
+		.on("click", function(d) {
+		  var ent = d.properties.CVE_ENT;
+		  var mun = d.properties.CVE_MUN;
+		  console.log(ent, mun);
+
+		  d3.xhr("/localidades")
+		    .header("Content-Type", "application/json")
+		    .post(JSON.stringify({ cve:{ ent:ent, mun:mun }}), function(err, data) {
+
+			d3.selectAll("path").remove();
+			d3.selectAll("text").remove();
+
+			d3.json(String(mun), function(err,loc) {
+			  var keyLoc = Object.keys(loc.objects)[0]
+			  console.log(keyLoc);
+
+			  var localidades = topojson.feature(loc,loc.objects[keyLoc]);
+			  var locs = [];
+
+			  localidades.features.forEach(function(l) {
+			   var u = l.properties.CVE_MUN == mun && l.properties.AMBITO == "U"
+			   var c = l.properties.CVE_MUN == mun;
+			    if(u) locs.push(l);
+			  });
+
+			  localidades.features = locs;
+
+			  projection.scale(1).translate([0,0]);
+			  var b = path.bounds(localidades);
+			  var s = 0.95 / Math.max((b[1][0]-b[0][0]) / width, (b[1][1] - b[0][1]) / height);
+			  var t = [(width-s*(b[1][0]+b[0][0]))/2, (height-s*(b[1][1]+b[0][1]))/2];
+			  projection.scale(s).translate(t);
+
+
+			  svg.selectAll("path")
+	        	    .data(localidades.features)
+	        	    .enter().append("path")
+	        	    .attr({
+	      //    "class": function(d) { return d.NOMGEO; },
+	          	    "d": path,
+	          	    "fill": function(d) {
+		    	      if (d.properties.ciudad) return "rgba(216,39,53,0.75)"
+		    	      else return "transparent"
+		  	      }
+	        	    })
+	        	    .style({
+	          	      "stroke": "white",
+		              "stroke-width": "0.33px"
+	        	    })
+			  
+			});
+		    });
+
 		});
 
 	    })
