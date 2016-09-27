@@ -22,8 +22,12 @@ MongoClient.connect("mongodb://localhost:27017/PICS", function(err,db) {
     var query = db.collection("municipios").find({ "_id":id });
     var array = [];
     query.stream().on("data", function(d) { array.push(d); });
-    res.send("p"); // < -- ¿Por qué FUNCIONA esto?
-    app.get("/" + id, function(req,ress) { ress.json(array[0]); });
+    query.stream().on("end", function() {
+      res.send("");
+      app.get("/" + id, function(req,ress) { ress.json(array[0]); });
+    });
+//    res.send(""); // < -- ¿Por qué FUNCIONA esto?
+//    app.get("/" + id, function(req,ress) { ress.json(array[0]); });
   });
 
   app.post("/localidades", function(req,res) {
@@ -32,8 +36,13 @@ MongoClient.connect("mongodb://localhost:27017/PICS", function(err,db) {
     var query = db.collection("localidades").find({ "_id":id });
     var array = [];
     query.stream().on("data", function(d) { array.push(d); });
-    res.send("");
-    app.get("/" + page, function(req,ress) { ress.json(array[0]); });
+
+    query.stream().on("end", function(d) {
+      res.send("");
+      app.get("/" + page, function(req,ress) { ress.json(array[0]); });
+    });
+//    res.send("");
+//    app.get("/" + page, function(req,ress) { ress.json(array[0]); });
   });
 
   app.get("/entidadesJSON", function(req,res) {
@@ -56,16 +65,6 @@ var arr = [];
   
 });
 
-/*
-MongoClient.connect("mongodb://localhost:27017/SUN", function(err,db) {
-  app.get("/sunList", function(req,res) {
-    var query = db.collection("ciudadesUpdate").find({})
-//		.project({ "_id": 0 });
-
-    query.stream().on("data", function(d) { res.json(d); });
-  });
-});
-*/
 
 //  app.get("/", routes.index);
   app.get("/entidades", routes.entidades);
@@ -73,15 +72,7 @@ MongoClient.connect("mongodb://localhost:27017/SUN", function(err,db) {
   app.get("/localidadesPue", routes.localidadesPue);
   app.get("/manzanasPue", routes.manzanasPue);
 
-/*
-  app.post("/data", function(req,res) {
-    console.log(req.body);
-    res.send("");
-    var DATA;
-    app.get("/data", function(reqi,ress) { ress.send(req.body); });
 
-  });
-*/
 app.listen(8080, function() {
   console.log("server is on!");
 });

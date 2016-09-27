@@ -152,6 +152,7 @@ function blocks(f) {
   var file = require("./entidades/m/" + f + "_m.json");
   var mun = [];
   var shortList = [];
+  var copy = JSON.parse(JSON.stringify(file));
 
   file.features.forEach(function(d) {
     mun.push(d.properties.CVE_MUN);
@@ -164,16 +165,20 @@ function blocks(f) {
   }
 
   shortList.forEach(function(d) {
-    var copy = JSON.parse(JSON.stringify(file));
+//    var copy = JSON.parse(JSON.stringify(file));
 
-    var muns = copy.features.filter(function(m) {
+    var muns = file.features.filter(function(m) {
       return m.properties.CVE_MUN == d;
     });
 
     copy.features = muns;
 
-    fs.writeFileSync("./entidades/m/" + f + "/" + d + ".json", JSON.stringify(copy));
-    console.log(d + " written...");
+
+    var write = fs.createWriteStream("./entidades/m/" + f + "/" + d + ".json");
+    write.write(JSON.stringify(copy));
+    write.end();
+//    fs.writeFileSync("./entidades/m/" + f + "/" + d + ".json", JSON.stringify(copy));
+//    console.log(d + " written...");
   });
 
 };

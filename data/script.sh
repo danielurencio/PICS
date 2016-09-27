@@ -158,6 +158,7 @@ cotejar() {
 
 manzanas() {
   if [ -d entidades/m ]; then
+
     for i in entidades/m/*; do
       file=$(basename ${i});
       var=$(echo ${file%.*});
@@ -166,5 +167,14 @@ manzanas() {
         node script manzanas ${var::-2}
       fi
     done
+
+    for i in entidades/m/*/; do
+      for j in ${i}*; do
+        var=$(basename $j);
+        file=${var%.*};
+        echo $file;
+      done;
+    done
+
   fi
 }

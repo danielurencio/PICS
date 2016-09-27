@@ -85,6 +85,7 @@ d3.json("entidadesJSON", function(err,mx) {
 	    d3.selectAll("g").remove();
 
 	    d3.json(String(cve), function(err,est) {
+              if(!est) console.log("No data");
 	      var estKey = Object.keys(est.objects)[0];
 	      var municipios = topojson.feature(est, est.objects[estKey]);
 
@@ -135,6 +136,7 @@ d3.json("entidadesJSON", function(err,mx) {
 			d3.selectAll("text").remove();
 
 			d3.json(String(mun), function(err,loc) {
+			  if(!loc) console.log("No data for loc");
 			  var keyLoc = Object.keys(loc.objects)[0]
 			  console.log(keyLoc);
 
