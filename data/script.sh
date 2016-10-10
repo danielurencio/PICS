@@ -162,18 +162,19 @@ manzanas() {
     for i in entidades/m/*; do
       file=$(basename ${i});
       var=$(echo ${file%.*});
+
       if [[ ${var::-2} != m ]]; then
         mkdir entidades/m/${var::-2};
         node script manzanas ${var::-2}
-      fi
-    done
 
-    for i in entidades/m/*/; do
-      for j in ${i}*; do
-        var=$(basename $j);
-        file=${var%.*};
-        echo $file;
-      done;
+	for j in entidades/m/${var::-2}/*.json; do
+	  json=$(basename ${j});
+	  name=$(echo ${json%.*});
+	  topojson -o entidades/m/${var::-2}/${name}_t.json entidades/m/${var::-2}/${json} -p
+	  node script manzanas_id ${var::-2} ${name}_t.json;
+	  rm entidades/m/${var::-2}/${json};
+	done
+      fi
     done
 
   fi

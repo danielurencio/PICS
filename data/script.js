@@ -3,6 +3,7 @@ var d3 = require("d3");
 
 var input = process.argv[2];
 var flag = process.argv[3];
+var flag2 = process.argv[4];
 
 
 function setID(input) {
@@ -172,21 +173,34 @@ function blocks(f) {
     });
 
     copy.features = muns;
+    copy._id = copy.features[0].properties.CVE_ENT + copy.features[0].properties.CVE_MUN;
 
-
-    var write = fs.createWriteStream("./entidades/m/" + f + "/" + d + ".json");
-    write.write(JSON.stringify(copy));
-    write.end();
-//    fs.writeFileSync("./entidades/m/" + f + "/" + d + ".json", JSON.stringify(copy));
-//    console.log(d + " written...");
+//    var write = fs.createWriteStream("./entidades/m/" + f + "/" + d + ".json");
+//    write.write(JSON.stringify(copy));
+//    write.end();
+    fs.writeFileSync("./entidades/m/" + f + "/" + f + "-" + d + ".json", JSON.stringify(copy));
+    console.log(d + " written...");
   });
 
 };
 
+function blocks_id(f1,f2) {
+  var file = require("./entidades/m/" + f1 + "/" + f2);
+  var key = Object.keys(file.objects);
+  file._id = file.objects[key]._id;
+  delete file.objects[key]._id;
+  fs.writeFileSync("./entidades/m/" + f1 + "/" + f2, JSON.stringify(file));
+  console.log("\n\n");
+  console.log("||||||||||");
+  console.log("WROTE _id");
+  console.log("||||||||||");
+  console.log("\n\n");
+};
 
 if( input && input == "mun" || input == "l" ) setID(input);
 if( input == "sun" ) SUN(flag);
 if( input == "sunFile") SunJSON(flag);
 if( input == "manzanas") blocks(flag);
+if( input == "manzanas_id") blocks_id(flag,flag2);
 
 process.exit();
