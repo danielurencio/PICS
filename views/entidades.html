@@ -173,6 +173,10 @@ d3.json("entidadesJSON", function(err,mx) {
 	          	      "stroke": "white",
 		              "stroke-width": "0.33px"
 	        	    })
+			    .on("click", function(d) {
+				var id = d.properties.CVE_ENT + d.properties.CVE_MUN;
+				console.log(d.properties);
+			    });
 			  
 			});
 		    });
