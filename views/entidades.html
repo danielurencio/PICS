@@ -29,7 +29,6 @@ var path = d3.geo.path().projection(projection);
 
 d3.json("entidadesJSON", function(err,mx) {
   var key = Object.keys(mx.objects)[0];
-  console.log(key);
 
   var entidades = topojson.feature(mx, mx.objects[key]);
 
@@ -126,7 +125,6 @@ d3.json("entidadesJSON", function(err,mx) {
 		.on("click", function(d) {
 		  var ent = d.properties.CVE_ENT;
 		  var mun = d.properties.CVE_MUN;
-		  console.log(ent, mun);
 
 		  d3.xhr("/localidades")
 		    .header("Content-Type", "application/json")
@@ -138,7 +136,6 @@ d3.json("entidadesJSON", function(err,mx) {
 			d3.json(String(mun), function(err,loc) {
 			  if(!loc) console.log("No data for loc");
 			  var keyLoc = Object.keys(loc.objects)[0]
-			  console.log(keyLoc);
 
 			  var localidades = topojson.feature(loc,loc.objects[keyLoc]);
 			  var locs = [];
@@ -146,7 +143,7 @@ d3.json("entidadesJSON", function(err,mx) {
 			  localidades.features.forEach(function(l) {
 			   var u = l.properties.CVE_MUN == mun && l.properties.AMBITO == "U"
 			   var c = l.properties.CVE_MUN == mun;
-			    if(u) locs.push(l);
+			    if(c) locs.push(l);
 			  });
 
 			  localidades.features = locs;
@@ -173,9 +170,45 @@ d3.json("entidadesJSON", function(err,mx) {
 	          	      "stroke": "white",
 		              "stroke-width": "0.33px"
 	        	    })
+			    .on("mouseover", function(d) {
+			      d3.select(this).attr("fill", "rgb(216,39,53)");
+			    })
+			    .on("mouseout", function(d) {
+			      d3.select(this).attr("fill", "transparent");
+			    })
 			    .on("click", function(d) {
 				var id = d.properties.CVE_ENT + d.properties.CVE_MUN;
-				console.log(d.properties);
+				var loc = d.properties.CVE;
+				d3.selectAll("svg").remove();
+				d3.select("body").append("canvas")
+				  .attr({
+				   "width": window.innerWidth,
+				   "height": window.innerHeight,
+				   "margin": 0,
+				   "position": "absolute",
+				   "display": "block",
+				   "id": "canvas"
+				   });
+
+				var canvas = document.getElementById("canvas");
+				var ctx = canvas.getContext("2d");
+
+				d3.select("body").style("overflow","hidden");
+
+				d3.xhr("/manzanas")
+				  .header("Content-Type", "application/json")
+				  .post(JSON.stringify({ id: id }), function(err, data) {
+//				     window.location = id;
+				     d3.json(id, function(err, b) {
+					var keyB = Object.keys(b.objects);
+					var w = window.innerWidth;
+					var h = window.innerHeight;
+					var f = "rgba(255,255,255,0.05)";
+					var c = new City(b,w,h,"white",f);
+					c.display(ctx);
+					
+				     }) 
+				  })
 			    });
 			  
 			});
@@ -191,5 +224,47 @@ d3.json("entidadesJSON", function(err,mx) {
     });
 
 });
+
+
+function City(d,w,h,stroke,fill) {
+  this.data = d;
+  this.width = w;
+  this.height = h;
+  this.stroke = stroke;
+  this.fill = fill;
+}
+
+City.prototype = {
+
+  key: function() { return Object.keys(this.data.objects); },
+
+  feats: function () {
+        var f = topojson.feature(this.data,this.data.objects[this.key()]);
+	return f;
+  },
+
+  display: function(context1) {
+    var projection = d3.geo.mercator();
+    var path = d3.geo.path()
+        .projection(projection)
+        .context(context1);
+
+    var width = this.width, height = this.height;
+    projection.scale(1).translate([0,0]);
+    var b = path.bounds(this.feats());
+    var s = 0.95 / Math.max((b[1][0]-b[0][0]/width, (b[1][1]-b[0][1])/height));
+    var t = [(width-s*(b[1][0]+b[0][0]))/2, (height-s*(b[1][1]+b[0][1]))/2];
+    projection.scale(s).translate(t);
+
+    context1.strokeStyle = this.stroke;
+    context1.fillStyle = this.fill;
+    context1.beginPath();
+    context1.lineWidth = 0.09;
+    path(this.feats()); console.log(this.feats());
+    context1.fill();
+    context1.stroke();
+  }
+
+};
 
 </script>

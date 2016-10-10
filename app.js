@@ -21,28 +21,56 @@ MongoClient.connect("mongodb://localhost:27017/PICS", function(err,db) {
     var id = req.body.cve;
     var query = db.collection("municipios").find({ "_id":id });
     var array = [];
+
     query.stream().on("data", function(d) { array.push(d); });
+
     query.stream().on("end", function() {
+      console.log("Entidad " + id);
       res.send("");
-      app.get("/" + id, function(req,ress) { ress.json(array[0]); });
+      app.get("/" + id, function(req,ress,next) {
+	ress.json(array[0]);
+	return ress.end()
+      });
     });
-//    res.send(""); // < -- ¿Por qué FUNCIONA esto?
-//    app.get("/" + id, function(req,ress) { ress.json(array[0]); });
+
   });
 
-  app.post("/localidades", function(req,res) {
-    var id = req.body.cve.ent; console.log(req.body)
+  app.post("/localidades", function(req,res,next) {
+    var id = req.body.cve.ent;
     var page = req.body.cve.mun;
     var query = db.collection("localidades").find({ "_id":id });
     var array = [];
+
     query.stream().on("data", function(d) { array.push(d); });
 
     query.stream().on("end", function(d) {
       res.send("");
-      app.get("/" + page, function(req,ress) { ress.json(array[0]); });
+      app.get("/" + page, function(req,ress,next) {
+        ress.json(array[0]);
+        return ress.end();
+      });
+      console.log("Localidad " + page);
     });
-//    res.send("");
-//    app.get("/" + page, function(req,ress) { ress.json(array[0]); });
+
+  });
+
+  app.post("/manzanas", function(req,res) {
+    var id = req.body.id;
+    console.log(id);
+
+    var query = db.collection("manzanas").find({ "_id": id });
+    var array = [];
+
+    query.stream().on("data", function(d) { array.push(d); });
+
+    query.stream().on("end", function() {
+      res.send("");
+      app.get("/" + id, function(req,ress,next) {
+	ress.json(array[0]);
+	ress.end();
+      });
+    });
+
   });
 
   app.get("/entidadesJSON", function(req,res) {
@@ -50,7 +78,7 @@ MongoClient.connect("mongodb://localhost:27017/PICS", function(err,db) {
 		.project({ "_id":0 });
 
       query.stream().on("data", function(d) { return res.json(d); });
-      query.stream().on("close", function() { db.close(); });
+      query.stream().on("close", function() { db.close(); res.end()});
   });
 
 
@@ -60,13 +88,12 @@ MongoClient.connect("mongodb://localhost:27017/PICS", function(err,db) {
 var arr = [];
     query.stream().on("data", function(d) { arr.push(d);});
     query.stream().on("end", function(d) { res.json(arr); })
-//	res.send("hola");
+
   });
   
 });
 
 
-//  app.get("/", routes.index);
   app.get("/entidades", routes.entidades);
   app.get("/Puebla", routes.puebla);
   app.get("/localidadesPue", routes.localidadesPue);
