@@ -80,8 +80,9 @@ d3.json("entidadesJSON", function(err,mx) {
 	d3.xhr("/municipios")
 	  .header("Content-Type", "application/json")
 	  .post(JSON.stringify({ cve:cve }), function(err, data) {
-
+	    console.log(JSON.parse(data.response));
 	    d3.selectAll("g").remove();
+	    d3.selectAll("text").remove();
 
 	    d3.json(String(cve), function(err,est) {
               if(!est) console.log("No data");
@@ -113,6 +114,17 @@ d3.json("entidadesJSON", function(err,mx) {
 		  d3.select(this)
 		    .attr("fill", "rgb(216,39,53)")
 		    .style("stroke-width", "1.5px");
+
+		  d3.select("svg").append("text")
+	  	    .attr({
+		      "x": width/9,
+		      "y": height - height/6,
+		      "font-family":"BLTFRU",
+		      "font-size":"50px"
+	  	    })
+		    .style("fill", "white")
+		    .text(function() { return d.properties.NOMGEO; });
+
 		})
 		.on("mouseout", function(d) {
 		  d3.select(this)
@@ -121,6 +133,8 @@ d3.json("entidadesJSON", function(err,mx) {
 		      else return "transparent";
 		    })
 		    .style("stroke-width", "0.25px");
+
+		    d3.selectAll("text").remove();
 		})
 		.on("click", function(d) {
 		  var ent = d.properties.CVE_ENT;
@@ -172,13 +186,25 @@ d3.json("entidadesJSON", function(err,mx) {
 	        	    })
 			    .on("mouseover", function(d) {
 			      d3.select(this).attr("fill", "rgb(216,39,53)");
+
+			      d3.select("svg").append("text")
+			        .attr({
+			          "x": width/9,
+			          "y": height - height/6,
+			          "font-family":"BLTFRU",
+			          "font-size":"50px"
+			        })
+			        .style("fill", "white")
+			        .text(function() { return d.properties.NOMGEO; });
+
 			    })
 			    .on("mouseout", function(d) {
 			      d3.select(this).attr("fill", "transparent");
+			      d3.selectAll("text").remove();
 			    })
 			    .on("click", function(d) {
 				var id = d.properties.CVE_ENT + d.properties.CVE_MUN;
-				var loc = d.properties.CVE;
+				var loc = d.properties.CVE_LOC;
 				d3.selectAll("svg").remove();
 				d3.select("body").append("canvas")
 				  .attr({
@@ -198,16 +224,17 @@ d3.json("entidadesJSON", function(err,mx) {
 				d3.xhr("/manzanas")
 				  .header("Content-Type", "application/json")
 				  .post(JSON.stringify({ id: id }), function(err, data) {
-//				     window.location = id;
-				     d3.json(id, function(err, b) {
+				     console.log(JSON.parse(data.response));
+					var b = JSON.parse(data.response)
+				     //d3.json(id, function(err, b) {
 					var keyB = Object.keys(b.objects);
 					var w = window.innerWidth;
 					var h = window.innerHeight;
 					var f = "rgba(255,255,255,0.05)";
 					var c = new City(b,w,h,"white",f);
-					c.display(ctx);
+					c.display(ctx,loc);
 					
-				     }) 
+				    // }) 
 				  })
 			    });
 			  
@@ -243,24 +270,34 @@ City.prototype = {
 	return f;
   },
 
-  display: function(context1) {
+  display: function(context1,filter) {
     var projection = d3.geo.mercator();
     var path = d3.geo.path()
         .projection(projection)
         .context(context1);
 
+    var filteredFeats = this.feats().features.filter(function(d) {
+      return d.properties.CVE_LOC == filter;
+    });
+    
+    var newFeats = this.feats();
+    newFeats.features = filteredFeats;
+
+
     var width = this.width, height = this.height;
     projection.scale(1).translate([0,0]);
-    var b = path.bounds(this.feats());
+    var b = path.bounds(newFeats);
     var s = 0.95 / Math.max((b[1][0]-b[0][0]/width, (b[1][1]-b[0][1])/height));
     var t = [(width-s*(b[1][0]+b[0][0]))/2, (height-s*(b[1][1]+b[0][1]))/2];
     projection.scale(s).translate(t);
+    
+
 
     context1.strokeStyle = this.stroke;
     context1.fillStyle = this.fill;
     context1.beginPath();
     context1.lineWidth = 0.09;
-    path(this.feats()); console.log(this.feats());
+    path( newFeats );
     context1.fill();
     context1.stroke();
   }

@@ -18,10 +18,15 @@ var manzanasPue = function(req,res) {
   return res.render("manzanasPue");
 };
 
+var charts = function(req,res) {
+  return res.render("charts");
+};
+
 module.exports = {
   "index":index,
   "entidades":entidades,
   "puebla":puebla,
   "localidadesPue":localidadesPue,
-  "manzanasPue":manzanasPue
+  "manzanasPue":manzanasPue,
+  "charts":charts
 };

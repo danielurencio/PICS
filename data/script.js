@@ -1,5 +1,6 @@
 var fs = require("fs");
 var d3 = require("d3");
+var MongoClient = require("mongodb").MongoClient;
 
 var input = process.argv[2];
 var flag = process.argv[3];
@@ -184,6 +185,24 @@ function blocks(f) {
 
 };
 
+function denue_sun() {
+  var zm = fs.readFileSync("./SUN/1.csv", "utf8");
+  zm = d3.csv.parse(zm);
+  zm = zm.map(function(d) {
+    return {
+    "claveSUN": d["Número de registro en el Sistema Urbano Nacional 2010"],
+    "nombreSUN": d["Nombre de la ciudad (zona metropolitana)"],
+    "cve_mun": d["Clave del municipio"]
+    };
+  });
+  console.log(zm);
+ 
+  MongoClient.connect("mongodb://localhost:27017/PICS", function(err,db) {
+    var query = db.collection("denue").find()
+  });
+
+}
+
 function blocks_id(f1,f2) {
   var file = require("./entidades/m/" + f1 + "/" + f2);
   var key = Object.keys(file.objects);
@@ -202,5 +221,6 @@ if( input == "sun" ) SUN(flag);
 if( input == "sunFile") SunJSON(flag);
 if( input == "manzanas") blocks(flag);
 if( input == "manzanas_id") blocks_id(flag,flag2);
+if( input == "denue_sun" ) denue_sun();
 
 process.exit();
