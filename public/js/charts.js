@@ -4,7 +4,7 @@ d3.json("/SUN", function(err,data) {
   body.style("margin", "0");
 
   var zm = data.filter(function(d) {
-    return d["Tipo de ciudad"] == 3;
+    return d["Tipo de ciudad"] == 1;
   });
 
   var zmMean = d3.mean(zm, function(d) { return d["Población total 2010"] });
@@ -41,7 +41,7 @@ d3.json("/SUN", function(err,data) {
 
   var menus = [
    { "dimension": 30 }
-  ]
+  ];
 
   var menu = svg.selectAll("rect")
     .data(menus).enter()
@@ -75,6 +75,18 @@ d3.json("/SUN", function(err,data) {
 	  "alignment-baseline": "central"
 	})
 	.text(function(d) { return d["Nombre de la ciudad"]; })
+	.on("click", function(d) {
+	  var cveSUN = d['Número de registro en el Sistema Urbano Nacional 2010'];
+	  console.log(cveSUN);
+	  barChart(cveSUN);
+//  d3.xhr("/denue")
+//    .header("Content-Type", "application/json")
+//    .post(JSON.stringify({ 'cveSUN':cveSUN }), function(err,data) {
+      //console.log(data);
+//    });
+
+
+	});
 
   function change() {
       zms.transition()
@@ -85,8 +97,8 @@ d3.json("/SUN", function(err,data) {
 	d3.select(this)
 	  .transition()
 	  .attr({
-	    "cx": function(d) { y.range([100,600]); return y(d["Densidad media urbana"]); },
-	    "cy": function(d) { x.range([h,]); return x(d["Población total 2010"]); }
+	    "cx": function(d) { x.range([200,500]); return x(d["Población total 2010"]); },
+	    "cy": function(d) { y.range([500,200]); return y(d["Densidad media urbana"]); }
 	  })
       });
   }
@@ -97,6 +109,13 @@ function Scales(data,feature) {
   this.feature = feature;
 };
 
-Scales.prototype = {
-//  x: function(
+function barChart(cveSUN) {
+  d3.xhr("/denue")
+    .header("Content-Type", "application/json")
+    .post(JSON.stringify({ 'cveSUN':cveSUN }), function(err,data) {
+      var denue = JSON.parse(data.response);
+//      console.log(denue); 
+
+      
+    });
 };

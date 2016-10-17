@@ -86,7 +86,7 @@ MongoClient.connect("mongodb://localhost:27017/PICS", function(err,db) {
     var query = db.collection("SUNsocio").find({})
 		.project({
 		  "_id":0,
-		  "Número de registron en el Sistema Urbano Nacional 2010":1,
+		  "Número de registro en el Sistema Urbano Nacional 2010":1,
 		  "Nombre de la ciudad":1,
 		  "Tipo de ciudad": 1,
 		  "Población total 2010": 1,
@@ -98,13 +98,13 @@ MongoClient.connect("mongodb://localhost:27017/PICS", function(err,db) {
 
   });
 
-  app.get("/denue", function(req,res,next) {
-    var cveSUN = "1";
+  app.post("/denue", function(req,res,next) {
+    var cveSUN = req.body.cveSUN; console.log(cveSUN)
     var array = [];
     var query = db.collection("denue")
 	.find({
-	  "cveSUN": cveSUN,
-//	  "$where": "/^22*/.test(this['Código de la clase de actividad SCIAN'])"
+	  "cveSUN": String(cveSUN),
+	  "$where": "/^22..../.test(this['Código de la clase de actividad SCIAN'])"
 	})
 	.project({
 	  "Código de la clase de actividad SCIAN":1,
@@ -113,7 +113,10 @@ MongoClient.connect("mongodb://localhost:27017/PICS", function(err,db) {
 	});
 
     query.stream().on("data", function(d) { array.push(d); });
-    query.stream().on("end", function(d) { res.json(array); console.log(array.length); });
+    query.stream().on("end", function(d) {
+//	res.send(array);
+    });
+
   });
   
 });
@@ -129,3 +132,5 @@ MongoClient.connect("mongodb://localhost:27017/PICS", function(err,db) {
 app.listen(8080, function() {
   console.log("server is on!");
 });
+
+
