@@ -98,23 +98,17 @@ MongoClient.connect("mongodb://localhost:27017/PICS", function(err,db) {
 
   });
 
-  app.post("/denue", function(req,res,next) {
-    var cveSUN = req.body.cveSUN; console.log(cveSUN)
+  app.get("/sectorCount", function(req,res,next) {
+//    var cveSUN = req.body.cveSUN; console.log(cveSUN);
+    var query = db.collection("sectorCount").find().stream();
     var array = [];
-    var query = db.collection("denue")
-	.find({
-	  "cveSUN": String(cveSUN),
-	  "$where": "/^22..../.test(this['Código de la clase de actividad SCIAN'])"
-	})
-	.project({
-	  "Código de la clase de actividad SCIAN":1,
-	  "Nombre de clase de la actividad":1,
-	  "_id":0
-	});
 
-    query.stream().on("data", function(d) { array.push(d); });
-    query.stream().on("end", function(d) {
-//	res.send(array);
+    query.on("data", function(data) {
+      array.push(data);
+    });
+
+    query.on("end", function() {
+      res.json(array);
     });
 
   });

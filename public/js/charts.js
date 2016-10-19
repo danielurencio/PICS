@@ -79,13 +79,6 @@ d3.json("/SUN", function(err,data) {
 	  var cveSUN = d['Número de registro en el Sistema Urbano Nacional 2010'];
 	  console.log(cveSUN);
 	  barChart(cveSUN);
-//  d3.xhr("/denue")
-//    .header("Content-Type", "application/json")
-//    .post(JSON.stringify({ 'cveSUN':cveSUN }), function(err,data) {
-      //console.log(data);
-//    });
-
-
 	});
 
   function change() {
@@ -110,12 +103,8 @@ function Scales(data,feature) {
 };
 
 function barChart(cveSUN) {
-  d3.xhr("/denue")
-    .header("Content-Type", "application/json")
-    .post(JSON.stringify({ 'cveSUN':cveSUN }), function(err,data) {
-      var denue = JSON.parse(data.response);
-//      console.log(denue); 
-
-      
-    });
+  d3.json("/sectorCount", function(err, data) {
+    var ciudad = data.filter(function(d) { return d['_id'] == cveSUN; });
+    console.log(ciudad);
+  });
 };
