@@ -17,12 +17,14 @@ var dos = db.getCollection("SUN").aggregate([
  { $group: {
     _id: { "num": "$Número de registro en el Sistema Urbano Nacional 2010",
     ciudad: "$Nombre de la ciudad (conurbación)"},
+    pob: { "$sum": "$Población total de la localidad 2010" },
     entidades: { $addToSet: "$Nombre de la entidad federativa" },
     municipios: { $addToSet: "$Nombre del municipio" },
     localidades: { $addToSet: "$Nombre de la localidad" } } },
  { $project: {
     "_id": "$_id.num",
     "ciudad": "$_id.ciudad",
+    "pob":1,
     "entidades":1,
     "municipios": { $size: "$municipios" },
     "localidades": { $size: "$localidades" }
@@ -56,12 +58,14 @@ var tres = db.getCollection("SUN").aggregate([
      _id: {
      "num": "$Número de registro en el Sistema Urbano Nacional 2010",
      ciudad: "$Nombre de la ciudad (localidad)"},
+     pob: { "$sum": "$Población total de la localidad 2010" },
      entidades: { $addToSet: "$Nombre de la entidad federativa" },
      municipios: { $addToSet: "$Nombre del municipio" },
      localidades: { $addToSet: "$Nombre de la localidad" } } },
   { $project: {
      "_id": "$_id.num",
      "ciudad": "$_id.ciudad",
+     "pob":1,
      "entidades":1,
      "municipios": { $size: "$municipios" },
      "localidades": { $size: "$localidades" }  
