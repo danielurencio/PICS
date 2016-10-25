@@ -8,10 +8,8 @@ d3.json("/SUN", function(err,data) {
   });
 
   var zmMean = d3.mean(zm, function(d) { return d["Población total 2010"] });
-  //console.log(zmMean);
 
   var dd = zm.map(function(d) { return d["Población total 2010"] });
-  //console.log(dd);
 
   var x = d3.scale.linear()
     .domain([
@@ -95,6 +93,94 @@ d3.json("/SUN", function(err,data) {
 	  })
       });
   }
+
+  function barChart(cveSUN) {
+
+    d3.selectAll("rect").remove();
+    d3.json("/sectorCount", function(err, data) {
+
+      var margin = { 'top':20, 'bottom':100, 'right':250, 'left':40 };
+      var width = 600 - margin.left - margin.right;
+      var height = 600 - margin.top - margin.bottom;
+      var ciudad = data.filter(function(d) { return d['_id'] == cveSUN; })[0];
+      console.log(ciudad.count);
+
+      var objArray = [];
+
+      for(var i in ciudad.sectors) {
+	var obj = { 'sector':i, 'count':ciudad.sectors[i] };
+        objArray.push(obj);
+      }; 
+
+      var y = d3.scale.linear()
+	.domain([ 0, d3.max(objArray, function(d) { return d.count; }) ])
+	.range([ height, 10 ]);
+
+      var x = d3.scale.ordinal()
+	.domain(objArray.map(function(d) { return d.sector; }))
+	.rangeRoundBands([ 0, width + margin.top + margin.bottom ], .1)
+
+
+      var s = d3.scale.linear()
+	.domain(
+	  [d3.min(objArray, function(d) { return d.count; }),
+	  d3.max(objArray, function(d) { return d.count; })]
+	)
+	.range([0.6,0.9])
+
+      var xAxis = d3.svg.axis()
+	.scale(x)
+	.orient("bottom");
+
+      var yAxis = d3.svg.axis()
+	.scale(y)
+	.orient("left");
+
+      svg.append("g")
+	.attr({
+	 "transform": "translate(" + margin.right + "," + 600 + ")",
+	 "class": "x axis"
+	})
+	.call(xAxis);
+
+      d3.selectAll(".axis text")
+	.style({
+	 "font-family": "helvetica",
+	 "font-size": "10px"
+	})
+      d3.selectAll(".line").style({
+	"stroke-width":"1",
+	"fill":"none"
+      });
+      d3.selectAll(".x.axis path").attr("display", "inline");
+      d3.selectAll(".axis line,.axis path")
+	.attr({
+	 "fill": "none",
+	 "stroke": "black",
+	 "shape-rendering": "crispEdges"
+	});
+
+      svg.selectAll("bars").data(objArray)
+       .enter().append("rect")
+       .style({
+	"fill": function(d) {
+	  var alpha = d.count / ciudad.count;
+	  var color = "rgba(255,0,0," + s(d.count) + ")"
+	  return color;
+	},
+//	"stroke": "white"
+	})
+       .attr({
+        "x": function(d,i) { return margin.right + x(d.sector); },
+        "y": function(d) { return y(d.count) },
+        "width": x.rangeBand(),
+        "height": function(d) { return height + margin.top + margin.bottom - y(d.count); }
+       });
+
+    });
+  };
+
+
 });
 
 function Scales(data,feature) {
@@ -102,9 +188,4 @@ function Scales(data,feature) {
   this.feature = feature;
 };
 
-function barChart(cveSUN) {
-  d3.json("/sectorCount", function(err, data) {
-    var ciudad = data.filter(function(d) { return d['_id'] == cveSUN; });
-    console.log(ciudad);
-  });
-};
+
