@@ -43,8 +43,11 @@ municipios() {
  done
 
  cut Proyecciones_municipios_y_localidades/Municipios/$ent -d ',' -f 4- > resto
- paste 1_ok 2_ok 3_ok resto > ${ent}_ok.csv
+ paste 1_ok 2_ok 3_ok resto > Proyecciones_municipios_y_localidades/Municipios/${ent}_ok.csv
+ rm Proyecciones_municipios_y_localidades/Municipios/${ent}
  rm [1-3]*; rm resto;
 
 done 
+ rm header;
+
 }
