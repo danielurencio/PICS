@@ -1,5 +1,5 @@
 data() {
-  curl -o delitos.xlsx "http://sc.inegi.org.mx/cobdem/descargaformatosservlet?tipo=1&archivo=SIMBAD_01099_20161104015628730.xlsx"
+#  curl -o delitos.xlsx "http://sc.inegi.org.mx/cobdem/descargaformatosservlet?tipo=1&archivo=SIMBAD_42369_20161109102727723.xlsx"
   libreoffice --headless --convert-to csv --infilter=44,34,76,1 delitos.xlsx;
   rm delitos.xlsx;
   iconv -f ISO-8859-15 -t UTF-8 -o delitos1.csv delitos.csv;
@@ -22,5 +22,5 @@ store() {
 }
 
 export() {
- mongoexport -d PICS -c delitos --type=csv -f "_id,Total delitos,ciudad,Daño en las cosas (%),Delitos sexuales (%),Homicidio (%),Lesiones (%),Robo (%),Otros delitos (%)" -o delitosF.csv;
+ mongoexport -d PICS -c delitos --type=csv -f "_id,ciudad,delitos por cada 1000 habitantes" -o delitosF.csv;
 }

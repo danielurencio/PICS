@@ -160,3 +160,4 @@ db.consumoE.drop();
 
 array.forEach(function(doc) {
   db.consumoE.insert(doc);
+})
