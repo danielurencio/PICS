@@ -5,3 +5,5 @@ data/denue
 data/denueSHP
 data/SUN
 data/mip
+data/consumoEléctrico/*.csv
+data/seguridad/*.csv
