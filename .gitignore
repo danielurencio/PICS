@@ -7,3 +7,7 @@ data/SUN
 data/mip
 data/consumoEléctrico/*.csv
 data/seguridad/*.csv
+data/finanzas/*.xlsx
+data/finanzas/*.csv
+data/proyecciones/Proyecciones_municipios_y_localidades
+data/proyecciones/proyecciones.zip

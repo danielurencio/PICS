@@ -1,5 +1,6 @@
 data() {
-  curl "http://sc.inegi.org.mx/cobdem/descargaformatosservlet?tipo=1&archivo=SIMBAD_34168_20161105114729082.xlsx" > finanzas.xlsx;
+  
+#  curl "http://sc.inegi.org.mx/cobdem/descargaformatosservlet?tipo=1&archivo=SIMBAD_34168_20161105114729082.xlsx" > finanzas.xlsx;
   #libreoffice --headless --convert-to csv --infilter=44,34,76,1 finanzas.xlsx;
   #rm finanzas.xlsx;
   #iconv -f ISO-8859-15 -t UTF-8 -o finanzas1.csv finanzas.csv;
