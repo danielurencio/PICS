@@ -75,8 +75,8 @@ nombre=$(sed '5!d' $1 | cut -d ',' -f 1);
   for i in 0 1 2; do
     tail -n +5 ${levels[$i]}.txt > ${levels[$i],,}.txt; rm ${levels[$i]}.txt;
     sed -i 's/  */,/g' ${levels[$i],,}.txt;
-#    sed -i "s/$/,\\${levels[$i],,},\\${nombre},\\${cveMun:3:${#var}}/g" ${levels[$i],,}.txt;
-    sed -i "s/$/,pedo/g"
+#    sed -i "s/$/,\\${levels[$i],,},\\${nombre},\\${cveMun:3:${#cveMun}}/g" ${levels[$i],,}.txt;
+    sed -i "s/$/,\\${levels[$i],,},\\${nombre},\\${cveMun}/g" ${levels[$i],,}.txt;
 
     sed -i 's/máxima/temperatura máxima/g' ${levels[$i],,}.txt;
     sed -i 's/mínima/temperatura mínima/g' ${levels[$i],,}.txt;
