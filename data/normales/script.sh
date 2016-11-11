@@ -105,3 +105,9 @@ importAll() {
    mongoimport -d PICS -c normales --type=csv --headerline ${i};
  done
 }
+
+newDB() {
+  mongo normales.js
+  mongo clima.js
+  mongoexport -d PICS -c clima --type=csv -f '_id,temperatura máxima,temperatura mínima,precipitación,ciudad' -o clima.csv
+}

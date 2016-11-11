@@ -51,3 +51,7 @@ for(var i in array) {
   if( array[i].cveMun == precip[j]._id ) array[i].precip = precip[j]['precipitación'];
  }
 }
+
+array.forEach(function(d) {
+ db.clima.insert(d);
+});
