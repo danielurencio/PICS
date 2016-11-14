@@ -29,14 +29,14 @@ clean() {
 
     echo $i
     xlsx2csv ${i}${newName}.xlsx -s 1 > ${i}index.csv;
-  fi
 #################################################################
-
-  libreoffice --headless --convert-to xlsx ${i}${newName}.xls --outdir ${i};
-  rm ${i}${newName}.xls;
+  else
+    libreoffice --headless --convert-to xlsx ${i}${newName}.xls --outdir ${i};
+    rm ${i}${newName}.xls;
   
-  echo $i
-  xlsx2csv ${i}${newName}.xlsx -s 1 > ${i}index.csv;
+    echo $i
+    xlsx2csv ${i}${newName}.xlsx -s 1 > ${i}index.csv;
+  fi
  done;
 }
 
@@ -49,121 +49,117 @@ sheetNumber() {
   lle=$(cat ${i}index.csv | grep -n '6,,Llegada\|8,,Llegada' | cut -d',' -f1 | cut -d'.' -f2);
   prin=$(cat ${i}index.csv | grep -n "Principales i" | cut -d',' -f1 | cut -d'.' -f2);
 
-  xlsx2csv ${i}*.xlsx -s $cuar > ${i}cuartos.csv
-  xlsx2csv ${i}*.xlsx -s $est > ${i}establecimientos.csv
-  xlsx2csv ${i}*.xlsx -s $lle > ${i}llegadas.csv
-  xlsx2csv ${i}*.xlsx -s $prin > ${i}ocupación.csv
+  xlsx2csv ${i}*.xlsx -s $(expr $cuar + 1) > ${i}cuartos.csv
+  xlsx2csv ${i}*.xlsx -s $(expr $est + 1) > ${i}establecimientos.csv
+  xlsx2csv ${i}*.xlsx -s $(expr $lle + 1)> ${i}llegadas.csv
+  xlsx2csv ${i}*.xlsx -s $(expr $prin + 1) > ${i}ocupación.csv
  done
 }
 
-cuartos() {
+establecimientos() {
  for i in */; do
 
   if [[ $i == JAL/ ]]; then
-   num=$(cat ${i}cuartos.csv | grep -n 'y municipio",' | cut -d ':' -f 1);
+   num=$(cat ${i}establecimientos.csv | grep -n 'y municipio",' | cut -d ':' -f 1);
   elif [[ $i == CDMX/ ]]; then
-   num=$(cat ${i}cuartos.csv | grep -n 'Delegación' | cut -d ':' -f 1);
+   num=$(cat ${i}establecimientos.csv | grep -n 'Delegación' | cut -d ':' -f 1);
   else
-   num=$(cat ${i}cuartos.csv | grep -n "Municipio" | cut -d ':' -f 1);
+   num=$(cat ${i}establecimientos.csv | grep -n "Municipio" | cut -d ':' -f 1);
   fi
 
   if [[ $i == VER/ || $i == PUE/ || $i == HGO/ ]]; then
-    tail -n +$(expr 5 + ${num}) ${i}cuartos.csv > ${i}cuartos1.csv;
-#    rm ${i}cuartos.csv;
-#    mv ${i}cuartos1.csv ${i}cuartos.csv;
+    tail -n +$(expr 5 + ${num}) ${i}establecimientos.csv > ${i}establecimientos1.csv;
   else
-    tail -n +$(expr 4 + ${num}) ${i}cuartos.csv > ${i}cuartos1.csv;
-#    rm ${i}cuartos.csv
-#    mv ${i}cuartos1.csv ${i}cuartos.csv;
+    tail -n +$(expr 4 + ${num}) ${i}establecimientos.csv > ${i}establecimientos1.csv;
   fi
 
 
   if [[ ${i} == OAX/ ]]; then
-    fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
-    head -n +$(expr $fuente - 7) ${i}cuartos1.csv > ${i}cuartos2.csv
+    fuente=$(cat ${i}establecimientos1.csv | grep -n Fuente | cut -d ':' -f1);
+    head -n +$(expr $fuente - 7) ${i}establecimientos1.csv > ${i}establecimientos2.csv
   elif [[ ${i} == VER/ ]]; then
-    fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
-    head -n +$(expr $fuente - 6) ${i}cuartos1.csv > ${i}cuartos2.csv
+    fuente=$(cat ${i}establecimientos1.csv | grep -n Fuente | cut -d ':' -f1);
+    head -n +$(expr $fuente - 6) ${i}establecimientos1.csv > ${i}establecimientos2.csv
   elif [[ ${i} == YUC/ || ${i} == QROO/ || ${i} == NAY/ || ${i} == MEX/ || ${i} == DGO/ || ${i} == CAM/ || ${i} == AGS/ ]]; then
-    fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
-    head -n +$(expr $fuente - 5) ${i}cuartos1.csv > ${i}cuartos2.csv
+    fuente=$(cat ${i}establecimientos1.csv | grep -n Fuente | cut -d ':' -f1);
+    head -n +$(expr $fuente - 5) ${i}establecimientos1.csv > ${i}establecimientos2.csv
   elif [[ ${i} == TAB/ || ${i} == PUE/ || ${i} == BCS/ ]]; then
-    fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
-    head -n +$(expr $fuente - 3) ${i}cuartos1.csv > ${i}cuartos2.csv
+    fuente=$(cat ${i}establecimientos1.csv | grep -n Fuente | cut -d ':' -f1);
+    head -n +$(expr $fuente - 3) ${i}establecimientos1.csv > ${i}establecimientos2.csv
   else
-    fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
-    head -n +$(expr $fuente - 4) ${i}cuartos1.csv > ${i}cuartos2.csv
+    fuente=$(cat ${i}establecimientos1.csv | grep -n Fuente | cut -d ':' -f1);
+    head -n +$(expr $fuente - 4) ${i}establecimientos1.csv > ${i}establecimientos2.csv
   fi
 
  done
 
  ## GTO - Corregir líneas discontinuas
- unoGTO=$(sed -n '13p' GTO/cuartos2.csv);
- dosGTO=$(sed -n '14p' GTO/cuartos2.csv);
+ unoGTO=$(sed -n '13p' GTO/establecimientos2.csv);
+ dosGTO=$(sed -n '14p' GTO/establecimientos2.csv);
  tresGTO=$(echo $unoGTO $dosGTO);
- sed -i "s/\\$unoGTO/\\$tresGTO/g" GTO/cuartos2.csv;
- sed '14d' GTO/cuartos2.csv > GTO/c2.csv;
- rm GTO/cuartos2.csv; mv GTO/c2.csv GTO/cuartos2.csv;
+ sed -i "s/\\$unoGTO/\\$tresGTO/g" GTO/establecimientos2.csv;
+ sed '14d' GTO/establecimientos2.csv > GTO/e2.csv;
+ rm GTO/establecimientos2.csv; mv GTO/e2.csv GTO/establecimientos2.csv;
  
  ## HGO - Corregir líneas discontinuas
- unoHGO=$(sed -n '39p' HGO/cuartos2.csv);
- dosHGO=$(sed -n '40p' HGO/cuartos2.csv);
+ unoHGO=$(sed -n '39p' HGO/establecimientos2.csv);
+ dosHGO=$(sed -n '40p' HGO/establecimientos2.csv);
  tresHGO=$(echo $unoHGO $dosHGO);
- sed -i "s/\\$unoHGO/\\$tresHGO/g" HGO/cuartos2.csv;
- sed '40d' HGO/cuartos2.csv > HGO/c2.csv;
- rm HGO/cuartos2.csv; mv HGO/c2.csv HGO/cuartos2.csv;
+ sed -i "s/\\$unoHGO/\\$tresHGO/g" HGO/establecimientos2.csv;
+ sed '40d' HGO/establecimientos2.csv > HGO/e2.csv;
+ rm HGO/establecimientos2.csv; mv HGO/e2.csv HGO/establecimientos2.csv;
 
  ## JAL - Corregir líneas discontinuas
- unoJAL=$(sed -n '8p' JAL/cuartos2.csv);
- dosJAL=$(sed -n '9p' JAL/cuartos2.csv);
+ unoJAL=$(sed -n '8p' JAL/establecimientos2.csv);
+ dosJAL=$(sed -n '9p' JAL/establecimientos2.csv);
  tresJAL=$(echo $unoJAL $dosJAL);
- sed -i "s/\\$unoJAL/\\$tresJAL/g" JAL/cuartos2.csv;
- sed '9d' JAL/cuartos2.csv > JAL/c2.csv;
- rm JAL/cuartos2.csv; mv JAL/c2.csv JAL/cuartos2.csv;
+ sed -i "s/\\$unoJAL/\\$tresJAL/g" JAL/establecimientos2.csv;
+ sed '9d' JAL/establecimientos2.csv > JAL/e2.csv;
+ rm JAL/establecimientos2.csv; mv JAL/e2.csv JAL/establecimientos2.csv;
 
  ## VER - Corregir líneas discontinuas
- unoVER=$(sed -n '7p' VER/cuartos2.csv);
- dosVER=$(sed -n '8p' VER/cuartos2.csv);
+ unoVER=$(sed -n '7p' VER/establecimientos2.csv);
+ dosVER=$(sed -n '8p' VER/establecimientos2.csv);
  tresVER=$(echo $unoVER $dosVER);
- sed -i "s/\\$unoVER/\\$tresVER/g" VER/cuartos2.csv;
- sed '8d' VER/cuartos2.csv > VER/c2.csv;
- rm VER/cuartos2.csv; mv VER/c2.csv VER/cuartos2.csv;
+ sed -i "s/\\$unoVER/\\$tresVER/g" VER/establecimientos2.csv;
+ sed '8d' VER/establecimientos2.csv > VER/e2.csv;
+ rm VER/establecimientos2.csv; mv VER/e2.csv VER/establecimientos2.csv;
  unset unoVER dosVer tresVer;
 
- unoVER=$(sed -n '55p' VER/cuartos2.csv);
- dosVER=$(sed -n '56p' VER/cuartos2.csv);
+ unoVER=$(sed -n '55p' VER/establecimientos2.csv);
+ dosVER=$(sed -n '56p' VER/establecimientos2.csv);
  tresVER=$(echo $unoVER $dosVER);
- sed -i "s/\\$unoVER/\\$tresVER/g" VER/cuartos2.csv;
- sed '56d' VER/cuartos2.csv > VER/c2.csv;
- rm VER/cuartos2.csv; mv VER/c2.csv VER/cuartos2.csv;
+ sed -i "s/\\$unoVER/\\$tresVER/g" VER/establecimientos2.csv;
+ sed '56d' VER/establecimientos2.csv > VER/e2.csv;
+ rm VER/establecimientos2.csv; mv VER/e2.csv VER/establecimientos2.csv;
 
 
  for i in */; do
 
   if [[ $i == AGS/ ]]; then
-   sed -i 's/ ,,,,/,/g' ${i}cuartos2.csv;
+   sed -i 's/ ,,,,/,/g' ${i}establecimientos2.csv;
   else
-   sed -i 's/,,,,/,/g' ${i}cuartos2.csv;
+   sed -i 's/,,,,/,/g' ${i}establecimientos2.csv;
   fi
 
-  cat ${i}cuartos2.csv | cut -d',' -f1-2 > ${i}cuartos3.csv
-  sed -i "s/$/,\\${i::-1}/g" ${i}cuartos3.csv;
-  cat ${i}cuartos3.csv >> C.csv
+  cat ${i}establecimientos2.csv | cut -d',' -f1-2 > ${i}establecimientos3.csv
+  sed -i "s/$/,\\${i::-1}/g" ${i}establecimientos3.csv;
+  cat ${i}establecimientos3.csv >> E.csv
 
-  rm ${i}cuartos[1-3].csv;
+  rm ${i}establecimientos[1-3].csv;
   
  done;
 
- echo '_id,cuartos,ent' > head;
- cat head C.csv > CUARTOS.csv;
- rm C.csv head;
+ echo '_id,establecimientos,ent' > head;
+ cat head E.csv > ESTABLECIMIENTOS.csv;
+ rm E.csv head;
 
- sed -i 's/"//g' CUARTOS.csv
+ sed -i 's/"//g' ESTABLECIMIENTOS.csv
 }
 
 
-establecimientos() {
+cuartos() {
  for i in */; do
-  cat ${i}establecimientos.csv | wc -l;
+  cat ${i}cuartos.csv | wc -l;
  done
 }
