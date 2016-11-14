@@ -160,3 +160,10 @@ cuartos() {
 
  sed -i 's/"//g' CUARTOS.csv
 }
+
+
+establecimientos() {
+ for i in */; do
+  cat ${i}establecimientos.csv | wc -l;
+ done
+}

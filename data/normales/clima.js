@@ -1,4 +1,4 @@
-var conn = new Mongo();
+lima = db.clima.find({},{'_id':0}).toArray();r conn = new Mongo();
 var db = conn.getDB("PICS");
 
 var array = [];
@@ -168,7 +168,7 @@ no.filter(function(d) { if(d._id == 305 ) return d }).forEach(function(d) {
         });
 
 
-// Completar datos de ciudades en Campeche
+// Completar datos de ciudades en Tabasco
 no.filter(function(d) { if(d._id == 123 ) return d }).forEach(function(d) {
           delete d.muns;
           d['temperatura máxima'] = datosDeFaltantes[6]['temperatura máxima'];
@@ -190,6 +190,14 @@ no.filter(function(d) { if(d._id == 35 ) return d }).forEach(function(d) {
           d['temperatura máxima'] = datosDeFaltantes[3]['temperatura máxima'];
           d['temperatura mínima'] = datosDeFaltantes[3]['temperatura mínima'];
           d['precipitación'] = datosDeFaltantes[3]['precipitación'];
+        });
+
+// Completar datos de ciudades en Campeche
+no.filter(function(d) { if(d._id == 145 ) return d }).forEach(function(d) {
+          delete d.muns;
+          d['temperatura máxima'] = datosDeFaltantes[1]['temperatura máxima'];
+          d['temperatura mínima'] = datosDeFaltantes[1]['temperatura mínima'];
+          d['precipitación'] = datosDeFaltantes[1]['precipitación'];
         });
 
 var completos = si.concat(no);
