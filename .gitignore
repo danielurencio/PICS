@@ -13,3 +13,6 @@ data/proyecciones/Proyecciones_municipios_y_localidades
 data/proyecciones/proyecciones.zip
 data/normales/files
 data/normales/*.csv
+data/turismo/*.csv
+data/turismo/*.zip
+data/turismo/*/
