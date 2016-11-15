@@ -268,4 +268,42 @@ clearCuartos() {
  for i in */; do
   rm ${i}cuartos[1-4].csv
  done;
+}
+
+
+ocupa() {
+ for i in */; do
+#  printf "\n";
+#  echo $i;
+  nota=$(cat ${i}ocupación.csv | grep -n "Nota:" | cut -d ':' -f1);
+  head -n +$(expr ${nota} - 3) ${i}ocupación.csv > ${i}ocupa1.csv;
+
+  noches=$(cat ${i}ocupa1.csv | grep -n "Noches por" | cut -d ':' -f 1);
+  tail -n +$(expr ${noches} + 3) ${i}ocupa1.csv > ${i}ocupa2.csv;
+
+ cat ${i}ocupa2.csv | grep -v 'Residentes en el país\|No residentes en el país' > ${i}ocupa3.csv;
+ sed -i 's/,,,,/,/g' ${i}ocupa3.csv;
+ sed -i 's/ a[/]//g' ${i}ocupa3.csv
+
+ cat ${i}ocupa3.csv | cut -d ',' -f 1,2,4,5 > ${i}ocupa4.csv;
+# cat ${i}ocupa3.csv | cut -d ',' -f5 > ${i}ocupa5.csv;
+# paste ${i}ocupa4.csv ${i}ocupa5.csv > ${i}ocupa6.csv;
+
+ sed -i "s/^/\\${i::-1},/g" ${i}ocupa4.csv;
+ cat ${i}ocupa4.csv >> O.csv;
+ rm ${i}ocupa[1-4].csv;
+ 
+ done;
+
+ echo "ent,centro turístico,llegada de turistas,ocupación hotelera (%),estadía promedio (noches por turista)" > head;
+ cat head O.csv > OCUPACIÓN.csv
+
+ rm head O.csv;
+
 } 
+
+clearOcupa() {
+ for i in */; do
+  rm ${i}ocupa[1-6].csv;
+ done;
+}
