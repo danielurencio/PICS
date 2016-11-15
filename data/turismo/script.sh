@@ -159,7 +159,41 @@ establecimientos() {
 
 
 cuartos() {
+
  for i in */; do
-  cat ${i}cuartos.csv | wc -l;
+
+  if [[ $i == JAL/ ]]; then
+   num=$(cat ${i}cuartos.csv | grep -n 'y municipio",' | cut -d ':' -f 1);
+  elif [[ $i == CDMX/ ]]; then
+   num=$(cat ${i}cuartos.csv | grep -n 'Delegación' | cut -d ':' -f 1);
+  else
+   num=$(cat ${i}cuartos.csv | grep -n "Municipio" | cut -d ':' -f 1);
+  fi
+
+  if [[ $i == VER/ || $i == PUE/ || $i == HGO/ ]]; then
+    tail -n +$(expr 5 + ${num}) ${i}cuartos.csv > ${i}cuartos1.csv;
+  else
+    tail -n +$(expr 4 + ${num}) ${i}cuartos.csv > ${i}cuartos1.csv;
+  fi
+
+
+  if [[ ${i} == OAX/ ]]; then
+    fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
+    head -n +$(expr $fuente - 7) ${i}cuartos1.csv > ${i}cuartos2.csv
+  elif [[ ${i} == VER/ ]]; then 
+    fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
+    head -n +$(expr $fuente - 6) ${i}cuartos1.csv > ${i}cuartos2.csv
+  elif [[ ${i} == YUC/ || ${i} == QROO/ || ${i} == NAY/ || ${i} == MEX/ || ${i} == DGO/ || ${i} == CAM/ || ${i} == AGS/ ]]; then
+    fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
+    head -n +$(expr $fuente - 5) ${i}cuartos1.csv > ${i}cuartos2.csv
+  elif [[ ${i} == TAB/ || ${i} == PUE/ || ${i} == BCS/ ]]; then
+    fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
+    head -n +$(expr $fuente - 3) ${i}cuartos1.csv > ${i}cuartos2.csv
+  else
+    fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
+    head -n +$(expr $fuente - 4) ${i}cuartos1.csv > ${i}cuartos2.csv
+  fi
+
  done
-}
+
+} 
