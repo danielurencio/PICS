@@ -150,7 +150,7 @@ establecimientos() {
   
  done;
 
- echo '_id,establecimientos,ent' > head;
+ echo 'mun,establecimientos,ent' > head;
  cat head E.csv > ESTABLECIMIENTOS.csv;
  rm E.csv head;
 
@@ -256,7 +256,7 @@ cuartos() {
 
  done;
 
- echo '_id,cuartos,ent' > head;
+ echo 'mun,cuartos,ent' > head;
  cat head C.csv > CUARTOS.csv;
  rm C.csv head;
 
@@ -306,4 +306,10 @@ clearOcupa() {
  for i in */; do
   rm ${i}ocupa[1-6].csv;
  done;
+}
+
+import() {
+ mongoimport -d PICS -c turismoCuartos --type=csv --headerline CUARTOS.csv;
+ mongoimport -d PICS -c turismoEstablecimientos --type=csv --headerline ESTABLECIMIENTOS.csv;
+ mongoimport -d PICS -c turismoOcupa --type=csv --headerline OCUPACIÓN.csv;
 }
