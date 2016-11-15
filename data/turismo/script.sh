@@ -177,23 +177,95 @@ cuartos() {
   fi
 
 
-  if [[ ${i} == OAX/ ]]; then
-    fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
-    head -n +$(expr $fuente - 7) ${i}cuartos1.csv > ${i}cuartos2.csv
-  elif [[ ${i} == VER/ ]]; then 
-    fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
-    head -n +$(expr $fuente - 6) ${i}cuartos1.csv > ${i}cuartos2.csv
-  elif [[ ${i} == YUC/ || ${i} == QROO/ || ${i} == NAY/ || ${i} == MEX/ || ${i} == DGO/ || ${i} == CAM/ || ${i} == AGS/ ]]; then
-    fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
-    head -n +$(expr $fuente - 5) ${i}cuartos1.csv > ${i}cuartos2.csv
-  elif [[ ${i} == TAB/ || ${i} == PUE/ || ${i} == BCS/ ]]; then
-    fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
-    head -n +$(expr $fuente - 3) ${i}cuartos1.csv > ${i}cuartos2.csv
-  else
-    fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
-    head -n +$(expr $fuente - 4) ${i}cuartos1.csv > ${i}cuartos2.csv
-  fi
 
+ if [[ ${i} == OAX/ ]]; then
+   fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
+   head -n +$(expr $fuente - 7) ${i}cuartos1.csv > ${i}cuartos2.csv;
+ elif [[ ${i} == VER/ ]]; then
+   fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
+   head -n +$(expr $fuente - 6) ${i}cuartos1.csv > ${i}cuartos2.csv;
+ elif [[ ${i} == AGS/ || ${i} == DGO/ || ${i} == NAY/ || ${i} == MEX/ || ${i} == YUC/ || ${i} == QROO/ ]]; then
+   fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
+   head -n +$(expr $fuente - 5) ${i}cuartos1.csv > ${i}cuartos2.csv;
+ elif [[ ${i} == BCS/ || ${i} == TAB/ || ${i} == PUE/ ]]; then
+   fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
+   head -n +$(expr $fuente - 3) ${i}cuartos1.csv > ${i}cuartos2.csv;
+ else
+   fuente=$(cat ${i}cuartos1.csv | grep -n Fuente | cut -d ':' -f1);
+   head -n +$(expr $fuente - 4) ${i}cuartos1.csv > ${i}cuartos2.csv;
+ fi
+   
  done
 
+#####
+
+ ## GTO - Corregir líneas discontinuas
+ unoGTO=$(sed -n '13p' GTO/cuartos2.csv);
+ dosGTO=$(sed -n '14p' GTO/cuartos2.csv);
+ tresGTO=$(echo $unoGTO $dosGTO);
+ sed -i "s/\\$unoGTO/\\$tresGTO/g" GTO/cuartos2.csv;
+ sed '14d' GTO/cuartos2.csv > GTO/e2.csv;
+ rm GTO/cuartos2.csv; mv GTO/e2.csv GTO/cuartos2.csv;
+ 
+ ## HGO - Corregir líneas discontinuas
+ unoHGO=$(sed -n '39p' HGO/cuartos2.csv);
+ dosHGO=$(sed -n '40p' HGO/cuartos2.csv);
+ tresHGO=$(echo $unoHGO $dosHGO);
+ sed -i "s/\\$unoHGO/\\$tresHGO/g" HGO/cuartos2.csv;
+ sed '40d' HGO/cuartos2.csv > HGO/e2.csv;
+ rm HGO/cuartos2.csv; mv HGO/e2.csv HGO/cuartos2.csv;
+
+ ## JAL - Corregir líneas discontinuas
+ unoJAL=$(sed -n '8p' JAL/cuartos2.csv);
+ dosJAL=$(sed -n '9p' JAL/cuartos2.csv);
+ tresJAL=$(echo $unoJAL $dosJAL);
+ sed -i "s/\\$unoJAL/\\$tresJAL/g" JAL/cuartos2.csv;
+ sed '9d' JAL/cuartos2.csv > JAL/e2.csv;
+ rm JAL/cuartos2.csv; mv JAL/e2.csv JAL/cuartos2.csv;
+
+ ## VER - Corregir líneas discontinuas
+ unoVER=$(sed -n '7p' VER/cuartos2.csv);
+ dosVER=$(sed -n '8p' VER/cuartos2.csv);
+ tresVER=$(echo $unoVER $dosVER);
+ sed -i "s/\\$unoVER/\\$tresVER/g" VER/cuartos2.csv;
+ sed '8d' VER/cuartos2.csv > VER/e2.csv;
+ rm VER/cuartos2.csv; mv VER/e2.csv VER/cuartos2.csv;
+ unset unoVER dosVer tresVer;
+
+ unoVER=$(sed -n '56p' VER/cuartos2.csv);
+ dosVER=$(sed -n '57p' VER/cuartos2.csv);
+ tresVER=$(echo $unoVER $dosVER);
+ sed -i "s/\\$unoVER/\\$tresVER/g" VER/cuartos2.csv;
+ sed '57d' VER/cuartos2.csv > VER/e2.csv;
+ rm VER/cuartos2.csv; mv VER/e2.csv VER/cuartos2.csv;
+
+######
+ for i in */; do
+
+  if [[ $i == AGS/ ]]; then
+   sed -i 's/ ,,,,/,/g' ${i}cuartos2.csv;
+  else
+   sed -i 's/,,,,/,/g' ${i}cuartos2.csv;
+  fi
+
+  cat ${i}cuartos2.csv | cut -d',' -f1-2 > ${i}cuartos3.csv
+  sed -i "s/$/,\\${i::-1}/g" ${i}cuartos3.csv;
+  cat ${i}cuartos3.csv >> C.csv 
+
+  rm ${i}cuartos[1-3].csv;
+
+ done;
+
+ echo '_id,cuartos,ent' > head;
+ cat head C.csv > CUARTOS.csv;
+ rm C.csv head;
+
+ sed -i 's/"//g' CUARTOS.csv
+
+}
+
+clearCuartos() {
+ for i in */; do
+  rm ${i}cuartos[1-4].csv
+ done;
 } 
