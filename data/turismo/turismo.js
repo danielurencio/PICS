@@ -3,39 +3,39 @@ var db = conn.getDB("PICS");
 
 var array = [];
 /////PUSE UN ERROR A PROPÓSITO PARA RECORDAR QUE TENGO QUE LLENAR LAS CLAVES PARA CADA ENTIDAD!!
-error var claves = [
-{ 'ent':'', 'cve':1 },
-{ 'ent':'', 'cve':2 },
-{ 'ent':'', 'cve':3 },
-{ 'ent':'', 'cve':4 },
-{ 'ent':'', 'cve':5 },
-{ 'ent':'', 'cve':6 },
-{ 'ent':'', 'cve':7 },
-{ 'ent':'', 'cve':8 },
-{ 'ent':'', 'cve':9 },
-{ 'ent':'', 'cve':10 },
-{ 'ent':'', 'cve':11 },
-{ 'ent':'', 'cve':12 },
-{ 'ent':'', 'cve':13 },
-{ 'ent':'', 'cve':14 },
-{ 'ent':'', 'cve':15 },
-{ 'ent':'', 'cve':16 },
-{ 'ent':'', 'cve':17 },
-{ 'ent':'', 'cve':18 },
-{ 'ent':'', 'cve':19 },
-{ 'ent':'', 'cve':20 },
-{ 'ent':'', 'cve':21 },
-{ 'ent':'', 'cve':22 },
-{ 'ent':'', 'cve':23 },
-{ 'ent':'', 'cve':24 },
-{ 'ent':'', 'cve':25 },
-{ 'ent':'', 'cve':26 },
-{ 'ent':'', 'cve':27 },
-{ 'ent':'', 'cve':28 },
-{ 'ent':'', 'cve':29 },
-{ 'ent':'', 'cve':30 },
-{ 'ent':'', 'cve':31 },
-{ 'ent':'', 'cve':32 },
+ var claves = [
+{ 'ent':'AGS', 'cve':1 },
+{ 'ent':'BC', 'cve':2 },
+{ 'ent':'BCS', 'cve':3 },
+{ 'ent':'CAM', 'cve':4 },
+{ 'ent':'COAH', 'cve':5 },
+{ 'ent':'COL', 'cve':6 },
+{ 'ent':'CHIS', 'cve':7 },
+{ 'ent':'CHIH', 'cve':8 },
+{ 'ent':'CDMX', 'cve':9 },
+{ 'ent':'DGO', 'cve':10 },
+{ 'ent':'GTO', 'cve':11 },
+{ 'ent':'GRO', 'cve':12 },
+{ 'ent':'HGO', 'cve':13 },
+{ 'ent':'JAL', 'cve':14 },
+{ 'ent':'MEX', 'cve':15 },
+{ 'ent':'MICH', 'cve':16 },
+{ 'ent':'MOR', 'cve':17 },
+{ 'ent':'NAY', 'cve':18 },
+{ 'ent':'NL', 'cve':19 },
+{ 'ent':'OAX', 'cve':20 },
+{ 'ent':'PUE', 'cve':21 },
+{ 'ent':'QRO', 'cve':22 },
+{ 'ent':'QROO', 'cve':23 },
+{ 'ent':'SLP', 'cve':24 },
+{ 'ent':'SIN', 'cve':25 },
+{ 'ent':'SON', 'cve':26 },
+{ 'ent':'TAB', 'cve':27 },
+{ 'ent':'TAMS', 'cve':28 },
+{ 'ent':'TLAX', 'cve':29 },
+{ 'ent':'VER', 'cve':30 },
+{ 'ent':'YUC', 'cve':31 },
+{ 'ent':'ZAC', 'cve':32 },
 ];
 
 db.SUN.find({}, { "Nombre del municipio":1, "Clave del municipio":1, "Número de registro en el Sistema Urbano Nacional 2010":1,"_id":0,"Clave de la localidad":1,"Clave de la entidad federativa":1 }).toArray().forEach(function(d) {
@@ -51,16 +51,30 @@ db.SUN.find({}, { "Nombre del municipio":1, "Clave del municipio":1, "Número de
 var cuartos = db.turismoCuartos.find({},{_id:0}).toArray();
 var establecimientos = db.turismoEstablecimientos.find({},{_id:0}).toArray();
 
+/// CLAVES PARA CUARTOS...
+for(var i in cuartos) {
+ for(var j in claves) {
+  if ( cuartos[i].ent == claves[j].ent ) cuartos[i].cve = claves[j].cve;
+ }
+}
+
+/// CLAVES PARA ESTABLECIMIENTOS...
+for(var i in establecimientos) {
+ for(var j in claves) {
+  if ( establecimientos[i].ent == claves[j].ent ) establecimientos[i].cve = claves[j].cve;
+ }
+}
+
 for(var i in array) {
  for(var j in cuartos) {
-  if( array[i].mun == cuartos[j].mun ) array[i].cuartos = cuartos[j].cuartos;
+  if( array[i].mun == cuartos[j].mun && array[i].cveEnt == cuartos[j].cve ) array[i].cuartos = cuartos[j].cuartos;
  }
 }
 
 
 for(var i in array) {
  for(var j in establecimientos) {
-  if( array[i].mun == establecimientos[j].mun ) array[i].establecimientos = establecimientos[j].establecimientos;
+  if( array[i].mun == establecimientos[j].mun && array[i].cveEnt == establecimientos[j].cve ) array[i].establecimientos = establecimientos[j].establecimientos;
  }
 }
 
