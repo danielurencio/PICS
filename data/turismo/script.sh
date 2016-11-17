@@ -48,11 +48,16 @@ sheetNumber() {
   est=$(cat ${i}index.csv | grep -n "1,,Establecimientos de h" | cut -d',' -f1 | cut -d'.' -f2);
   lle=$(cat ${i}index.csv | grep -n '6,,Llegada\|8,,Llegada' | cut -d',' -f1 | cut -d'.' -f2);
   prin=$(cat ${i}index.csv | grep -n "Principales i" | cut -d',' -f1 | cut -d'.' -f2);
+  cen=$(cat ${i}index.csv | grep -n "Ocupación hotelera y estadía promedio en centros turísticos y municipios" | cut -d',' -f1 | cut -d'.' -f2);
 
   xlsx2csv ${i}*.xlsx -s $(expr $cuar + 1) > ${i}cuartos.csv
   xlsx2csv ${i}*.xlsx -s $(expr $est + 1) > ${i}establecimientos.csv
   xlsx2csv ${i}*.xlsx -s $(expr $lle + 1)> ${i}llegadas.csv
   xlsx2csv ${i}*.xlsx -s $(expr $prin + 1) > ${i}ocupación.csv
+ if [[ $cen == 8 ]]; then
+  xlsx2csv ${i}*.xlsx -s $(expr $cen + 1) > ${i}cen.csv;
+ fi
+
  done
 }
 
@@ -307,9 +312,139 @@ clearOcupa() {
   rm ${i}ocupa[1-6].csv;
  done;
 }
+######################################################
+######################################################
+centrosYmuns() {
+ for i in */; do
+
+  if [ -f ${i}cen.csv ]; then
+    echo $i
+    nota=$( cat ${i}cen.csv | grep -n "Nota:" | cut -d ':' -f1 );
+    head -n +$(expr ${nota} - 3) ${i}cen.csv > ${i}cen1.csv;
+    municipios=$( cat ${i}cen1.csv | grep -n "Municipio,\|Municipios" | cut -d':' -f1);
+    tail -n +$(expr ${municipios} + 1) ${i}cen1.csv > ${i}cen2.csv;
+
+    if [[ $i == GTO/ ]]; then
+      sed 1d ${i}cen2.csv > ${i}cen3.csv; rm ${i}cen2.csv; mv ${i}cen3.csv ${i}cen2.csv;
+      sed -i 's/la Independencia Nacional"/Dolores Hidalgo Cuna de la Independencia Nacional/g' ${i}cen2.csv
+    fi
+
+    sed -i "s/,,,,/,/g" ${i}cen2.csv;
+    sed -i "s/,,/,/g" ${i}cen2.csv;
+    sed -i "s/,,//g" ${i}cen2.csv;
+    sed -i "s/ [a-z][/]//g" ${i}cen2.csv
+    sed -i "s/^/\\${i::-1},/g" ${i}cen2.csv
+## DELETE ALL  .........
+    sed -i "s/,//g" ${i}cen2.csv;
+    sed -i "s///g" ${i}cen2.csv;
+  fi
+
+  if [[ ${i} == CHIH/ ]]; then
+    sed -i "s/ *//g" ${i}cen2.csv;
+    sed -i "s/SanFranciscodeConchos/San Francisco de Conchos/g" ${i}cen2.csv;
+  fi
+
+  if [ -f ${i}cen2.csv ]; then
+    cat ${i}cen2.csv >> CENS.csv;
+    rm ${i}cen[1-5].csv;
+  fi
+
+ done
+
+ echo "ent,mun,ocupación hotelera (%),estadía promedio (noches por turista)" > head;
+ cat head CENS.csv > CEN.csv;
+ rm CENS.csv head; 
+}
+
+clearCM() {
+ for i in */; do
+  if [[ -f ${i}cen[1-5].csv ]]; then
+   rm ${i}cen[1-5].csv;
+  fi
+ done
+}
+
+######################################################
+######################################################
 
 import() {
  mongoimport -d PICS -c turismoCuartos --type=csv --headerline CUARTOS.csv;
  mongoimport -d PICS -c turismoEstablecimientos --type=csv --headerline ESTABLECIMIENTOS.csv;
  mongoimport -d PICS -c turismoOcupa --type=csv --headerline OCUPACIÓN.csv;
+ mongoimport -d PICS -c cens --type=csv --headerline CEN.csv;
+
+}
+
+llegadas() {
+ for i in */; do
+   printf "\n"
+   echo $i
+
+   if [[ ${i} == CAM/ ]]; then
+    corteAbajo=$(cat ${i}llegadas.csv | grep -n "Municipio,,,,1345" | cut -d':' -f1);
+   else
+    corteAbajo=$(cat ${i}llegadas.csv | grep -n "Municipio,\|Municipios\|Municipio E/\|Distrito Federal," | cut -d':' -f1)
+
+   fi
+
+
+   if [[ ${i} == DGO/ ]]; then
+     corteArriba=$(cat ${i}llegadas.csv | grep -n 'Nota:' | cut -d':' -f1);
+     head -n +$(expr ${corteArriba} - 3) ${i}llegadas.csv > ${i}llegadas1.csv;
+     echo ${corteArriba};
+
+   elif [[ ${i} == TAB/ ]]; then
+     corteArriba=$(cat ${i}llegadas.csv | grep -n 'Fuente:' | cut -d':' -f1);
+     head -n +$(expr ${corteArriba} - 3) ${i}llegadas.csv > ${i}llegadas1.csv;
+     echo ${corteArriba};
+
+   else
+     corteArriba=$( cat ${i}llegadas.csv | grep -n 'a/,I\|a/,"I\|a/,E\|a/,S\|a/,Co' | cut -d':' -f1);
+#     head -n +$corteArriba ${i}llegadas.csv > ${i}llegadas1.csv;
+     echo ${corteArriba};
+	una=$(sed -n $(expr ${corteArriba} - 1)p ${i}llegadas.csv);
+	nota=$(echo $una | grep : | cut -d':' -f1);
+     if [[ $nota == Nota ]]; then
+       head -n +$(expr ${corteArriba} - 4) ${i}llegadas.csv > ${i}llegadas1.csv;
+       echo SÍ!;
+     else
+       head -n +$(expr ${corteArriba} - 3) ${i}llegadas.csv > ${i}llegadas1.csv;
+       echo NO!
+     fi
+   fi
+
+   tail -n +$(expr ${corteAbajo} + 1) ${i}llegadas1.csv > ${i}llegadas2.csv;
+
+#   sed -i "s/,//g" ${i}llegadas2.csv;
+ #  sed -i "s///g" ${i}llegadas2.csv;
+   sed -i "s/,,,,/,/g" ${i}llegadas2.csv;
+   sed -i "s/,,/,/g" ${i}llegadas2.csv;
+   sed -i "s/^/\\${i::-1},/g" ${i}llegadas2.csv;
+
+   if [[ ${i} == CHIH/ ]]; then
+     sed -i "s/ *//g" ${i}llegadas2.csv;
+     sed -i "s/SanFranciscodeConchos/San Francisco de Conchos/g" ${i}llegadas2.csv;
+   fi
+
+
+   if [[ ${i} == AGS/ ]]; then
+     sed -i "s/Calvillo /Calvillo/g" ${i}llegadas2.csv;
+     sed -i "s/San Francisco de los Romo /San Francisco de los Romo/g" ${i}llegadas2.csv;
+   fi
+
+   cat ${i}llegadas2.csv | cut -d ',' -f1-3 > ${i}llegadas3.csv;
+   cat ${i}llegadas3.csv >> L.csv;
+   rm ${i}llegadas[1-5].csv;
+ done
+
+ echo "ent,mun,llegadas" > head;
+ cat head L.csv > LLEGADAS.csv;
+ rm head L.csv;
+}
+
+clearLlegadas() {
+ for i in */; do
+  rm ${i}llegadas[1-5].csv
+ done
+
 }
