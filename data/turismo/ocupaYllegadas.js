@@ -38,8 +38,17 @@ var db = conn.getDB("PICS");
 
 var array = [];
 var array1 = [];
+var array2 = []; // llegadas sólo municipios
+var aaa = [];
 
-db.SUN.find({}, { "Nombre del municipio":1, "Clave del municipio":1, "Número de registro en el Sistema Urbano Nacional 2010":1,"_id":0,"Clave de la localidad":1,"Clave de la entidad federativa":1 }).toArray().forEach(function(d) {
+var SUNLIST = db.SUN.find({}, { "Nombre del municipio":1, "Clave del municipio":1, "Número de registro en el Sistema Urbano Nacional 2010":1,"_id":0,"Clave de la localidad":1,"Clave de la entidad federativa":1 }).toArray()
+
+
+var SUNLIST1 = db.SUN.find({}, { "Nombre del municipio":1, "Clave del municipio":1, "Número de registro en el Sistema Urbano Nacional 2010":1,"_id":0,"Clave de la localidad":1,"Clave de la entidad federativa":1 }).toArray()
+
+var SUNLIST2 = db.SUN.find({}, { "Nombre del municipio":1, "Clave del municipio":1, "Número de registro en el Sistema Urbano Nacional 2010":1,"_id":0,"Clave de la localidad":1,"Clave de la entidad federativa":1 }).toArray()
+
+SUNLIST.forEach(function(d) {
  var obj = {};
  obj.mun = d['Nombre del municipio'];
  obj.cveEnt = d['Clave de la entidad federativa'];
@@ -47,12 +56,41 @@ db.SUN.find({}, { "Nombre del municipio":1, "Clave del municipio":1, "Número de
  obj.cveSUN = d['Número de registro en el Sistema Urbano Nacional 2010'];
  if( d['Clave de la localidad'] ) obj.loc = d['Clave de la localidad'];
  array.push(obj);
+ //array1.push(obj);
+// array2.push(obj);
+ //aaa.push(obj);
+});
+
+SUNLIST1.forEach(function(d) {
+ var obj = {};
+ obj.mun = d['Nombre del municipio'];
+ obj.cveEnt = d['Clave de la entidad federativa'];
+ obj.cveMun = d['Clave del municipio'];
+ obj.cveSUN = d['Número de registro en el Sistema Urbano Nacional 2010'];
+ if( d['Clave de la localidad'] ) obj.loc = d['Clave de la localidad'];
+// array.push(obj);
  array1.push(obj);
+// array2.push(obj);
+ //aaa.push(obj);
 });
 
 
+SUNLIST2.forEach(function(d) {
+ var obj = {};
+ obj.mun = d['Nombre del municipio'];
+ obj.cveEnt = d['Clave de la entidad federativa'];
+ obj.cveMun = d['Clave del municipio'];
+ obj.cveSUN = d['Número de registro en el Sistema Urbano Nacional 2010'];
+ if( d['Clave de la localidad'] ) obj.loc = d['Clave de la localidad'];
+// array.push(obj);
+ //array1.push(obj);
+ array2.push(obj);
+ //aaa.push(obj);
+});
+
 var ocupa = db.turismoOcupa.find({},{ '_id':0 }).toArray();
 var cens = db.cens.find({},{ '_id':0 }).toArray();
+var llegadas = db.llegadas.find({},{ '_id':0 }).toArray();
 
 /// CLAVES PARA OCUPAS...
 for(var i in ocupa) {
@@ -65,6 +103,13 @@ for(var i in ocupa) {
 for(var i in cens) {
  for(var j in claves) {
   if ( cens[i].ent == claves[j].ent ) cens[i].cve = claves[j].cve;
+ }
+}
+
+/// CLAVES PARA LLEGADAS...
+for(var i in llegadas) {
+ for(var j in claves) {
+  if ( llegadas[i].ent == claves[j].ent ) llegadas[i].cve = claves[j].cve;
  }
 }
 
@@ -109,8 +154,16 @@ for(var i in sun) {
  }
 }
 
+// Cotejar claves del componente principal con todos los municipios
+for(var i in sun) {
+ for(var j in array2) {
+  if( sun[i]._id == array2[j].cveSUN ) array2[j].ciudad = sun[i].ciudad;
+ }
+}
+
 array = array.filter(function(d) { return d.ciudad; });
 array1 = array1.filter(function(d) { return d.ciudad; });
+array2 = array2.filter(function(d) { return d.ciudad; });
 
 array.forEach(function(d) {
  db.turismo.insert(d);
@@ -221,6 +274,7 @@ var centrosT = db.turismo.aggregate([
   { '$project': {
      '_id':'$_id.cveSUN',
      'ciudad':'$_id.ciudad',
+     'llegada de turistas': 1,//{ '$addToSet':'$llegada de turistas' },
      'ocupación hotelera (%)': { '$avg':'$ocupación hotelera (%)' },
      'estadía promedio (noches por turista)': { '$avg':'$estadía promedio (noches por turista)' }
   } }
@@ -228,3 +282,36 @@ var centrosT = db.turismo.aggregate([
 
 db.turismo.drop();
 
+///llegadas
+for(var i in array2) {
+ for(var j in llegadas) {
+
+ if ( array2[i].cveEnt == llegadas[j].cve && array2[i].mun == llegadas[j].mun ) {
+  
+    array2[i].llegadas = llegadas[j].llegadas;
+   
+  }
+
+ }
+}
+
+
+array2 = array2.filter(function(d) { return d['llegadas']; });
+
+array2.forEach(function(doc) {
+ db.turismo.insert(doc);
+});
+
+var Llegadas = db.turismo.aggregate([
+  { '$group': {
+     '_id': { "cveSUN":"$cveSUN", "ciudad":"$ciudad" },
+     'llegadas': { '$addToSet':'$llegadas' }
+  } },
+  { '$project': {
+     '_id':'$_id.cveSUN',
+     'ciudad':'$_id.ciudad',
+     'llegadas': { '$sum':'$llegadas' }
+  } }
+]).toArray();
+
+db.turismo.drop();

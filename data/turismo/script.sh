@@ -372,7 +372,8 @@ import() {
  mongoimport -d PICS -c turismoEstablecimientos --type=csv --headerline ESTABLECIMIENTOS.csv;
  mongoimport -d PICS -c turismoOcupa --type=csv --headerline OCUPACIÓN.csv;
  mongoimport -d PICS -c cens --type=csv --headerline CEN.csv;
-
+ mongoimport -d PICS -c llegadas --type=csv --headerline LLEGADAS.csv;
+ 
 }
 
 llegadas() {
