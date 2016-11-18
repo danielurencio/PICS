@@ -48,7 +48,7 @@ sheetNumber() {
   est=$(cat ${i}index.csv | grep -n "1,,Establecimientos de h" | cut -d',' -f1 | cut -d'.' -f2);
   lle=$(cat ${i}index.csv | grep -n '6,,Llegada\|8,,Llegada' | cut -d',' -f1 | cut -d'.' -f2);
   prin=$(cat ${i}index.csv | grep -n "Principales i" | cut -d',' -f1 | cut -d'.' -f2);
-  cen=$(cat ${i}index.csv | grep -n "Ocupación hotelera y estadía promedio en centros turísticos y municipios" | cut -d',' -f1 | cut -d'.' -f2);
+  cen=$(cat ${i}index.csv | grep -n "Ocupación hotelera y estadía promedio en centros turísticos y municipios\|Ocupación hotelera y estadía promedio por delegación" | cut -d',' -f1 | cut -d'.' -f2);
 
   xlsx2csv ${i}*.xlsx -s $(expr $cuar + 1) > ${i}cuartos.csv
   xlsx2csv ${i}*.xlsx -s $(expr $est + 1) > ${i}establecimientos.csv
@@ -321,7 +321,7 @@ centrosYmuns() {
     echo $i
     nota=$( cat ${i}cen.csv | grep -n "Nota:" | cut -d ':' -f1 );
     head -n +$(expr ${nota} - 3) ${i}cen.csv > ${i}cen1.csv;
-    municipios=$( cat ${i}cen1.csv | grep -n "Municipio,\|Municipios" | cut -d':' -f1);
+    municipios=$( cat ${i}cen1.csv | grep -n "Municipio,\|Municipios\|Distrito Federal,," | cut -d':' -f1);
     tail -n +$(expr ${municipios} + 1) ${i}cen1.csv > ${i}cen2.csv;
 
     if [[ $i == GTO/ ]]; then
@@ -447,5 +447,10 @@ clearLlegadas() {
  for i in */; do
   rm ${i}llegadas[1-5].csv
  done
+
+}
+
+export() {
+ mongoexport -d PICS -c turismo --type=csv -o turismo.csv -f '_id,ciudad,centro turístico,establecimientos,cuartos,llegada de turistas,ocupación hotelera (%),estadía promedio (noches por turista)'
 
 }

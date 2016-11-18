@@ -119,10 +119,32 @@ var t = db.turismo.aggregate([
     ciudad: "$_id.ciudad",
     cuartos: { "$sum":"$cuartos" },
     establecimientos: { "$sum":"$establecimientos" },
-    muns: 1
+//    muns: 1
 //    locs:1
+ } }
+]).toArray();
+
+var comparten = db.turismo.aggregate([
+ { $group: {
+   _id: "$cveMun",
+   ciudades: { "$addToSet":"$ciudad" }
  } }
 ]).toArray();
 
 db.turismo.drop();
 
+
+var L = db.llegadasOcupaEstadia.find().toArray();
+
+for(var i in L) {
+ for(var j in t) {
+  if( L[i]._id == t[j]._id ) {
+   L[i].establecimientos = t[j].establecimientos;
+   L[i].cuartos = t[j].cuartos;
+  }
+ }
+}
+
+L.forEach(function(doc) {
+ db.turismo.insert(doc);
+});

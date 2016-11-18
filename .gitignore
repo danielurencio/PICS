@@ -16,3 +16,5 @@ data/normales/*.csv
 data/turismo/*.csv
 data/turismo/*.zip
 data/turismo/*/
+data/marg/*.csv
+data/marg/*.xlsx
