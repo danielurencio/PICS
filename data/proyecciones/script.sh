@@ -51,3 +51,53 @@ done
  rm header;
 
 }
+
+localidades() {
+
+ dir=Proyecciones_municipios_y_localidades/Localidades/
+
+ for i in ${dir}*; do
+  ent=$(basename $i | cut -d'_' -f1);
+  printf "\n";
+  echo $ent;
+
+  xlsx2csv $i > ${dir}${ent}.csv;
+
+  cutAbajo=$(cat ${dir}${ent}.csv | grep -n Nota | cut -d':' -f1);
+  cutArriba=$(cat ${dir}${ent}.csv | grep -n "Clave entidad" | cut -d':' -f1);
+#  echo $cutAbajo;
+#  echo $cutArriba;
+
+  head -n +$(expr ${cutAbajo} - 1) ${dir}${ent}.csv > ${dir}${ent}_1.csv;
+  tail -n +$cutArriba ${dir}${ent}_1.csv > ${dir}${ent}_2.csv;
+
+  rm ${dir}${ent}.csv;
+  mv ${dir}${ent}_2.csv ${dir}${ent}.csv;
+  rm ${dir}${ent}_[1-2].csv;
+
+ done
+
+ rm ${dir}*.xlsx
+}
+
+import() {
+  dir=Proyecciones_municipios_y_localidades/
+
+  for i in Municipios Localidades; do
+   printf "\n";
+
+    for j in ${dir}${i}/*; do
+      mongoimport -d PICS -c proy${i} --type=csv --headerline ${j};
+    done
+
+  done;
+}
+
+createDBs() {
+ mongo proyMun.js
+ mongo proyLoc.js
+}
+
+export() {
+ mongoexport -d PICS -c proySUN --type=csv -f '_id,ciudad,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030' -o proy.csv;
+}
