@@ -19,3 +19,7 @@ data/turismo/*.zip
 data/turismo/*/
 data/marg/*.csv
 data/marg/*.xlsx
+data/vulnerabilidadYresiliencia/*.csv
+data/vulnerabilidadYresiliencia/*.zip
+data/energías/*.xls
+data/energías/*.csv
