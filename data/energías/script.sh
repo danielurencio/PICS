@@ -149,6 +149,8 @@ sed -i 's/Santiago Tulantepec De Lugo Guerrero/Santiago Tulantepec de Lugo Guerr
  sed -i 's/Villa de Casas/Casas/g' data.csv;
  sed -i 's/Tatíla/Tatatila/g' data.csv;
  sed -i 's/Tuzamapan Coatepec/Coatepec/g' data.csv;
+ sed -i 's/Industrial San Luis/San Luis Potosí/g' data.csv;
+ sed -i 's/Cd. San Luis Potosí/San Luis Potosí/g' data.csv;
 }
 
 import() {
