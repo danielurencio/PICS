@@ -15,16 +15,14 @@ zm.forEach(function(d) {
 });
 
 var sun = ZM.concat(conurbaciones).concat(centros);
-var cc = db1.sun.find().toArray();
+var a = db1.potencial.find().toArray();
 
-for(var i in sun) {
- for(var j in cc) {
-  if( sun[i]._id == cc[j].CVE_SUN ) cc[j].cc = sun[i]._id;
+for(var i in a) {
+ for(var j in sun) {
+  if( a[i].cveSUN == sun[j]._id ) a[i].ciudad = sun[j].ciudad;
  }
 }
 
-db1.sun.drop();
-
-cc.forEach(function(d) { 
-  db1.sun.insert(d);
-});
+db1.potencial.drop();
+a = a.filter(function(d) { return d.ciudad; });
+db1.potencial.insert(a);

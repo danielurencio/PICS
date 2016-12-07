@@ -5,7 +5,7 @@ src_filename = sys.argv[1]
 shp_filename = sys.argv[2]
 band = int(sys.argv[3])
 bandStr = sys.argv[3]
-value = sys.argv[3]
+value = sys.argv[4]
 
 src_ds=gdal.Open(src_filename) 
 gt=src_ds.GetGeoTransform()
@@ -14,7 +14,7 @@ rb=src_ds.GetRasterBand(band)
 ds=ogr.Open(shp_filename,1)
 lyr=ds.GetLayer()
 # Add a new field
-new_field = ogr.FieldDefn(vale + bandStr, ogr.OFTInteger)
+new_field = ogr.FieldDefn(value + bandStr, ogr.OFTInteger)
 lyr.CreateField(new_field)
 
 for feat in lyr:
