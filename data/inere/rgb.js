@@ -86,16 +86,16 @@ for(var u in b) {
 }
 
 var solar = [
- { _id:"170,222,0",value: 4.5 },
- { _id:"193,232,0",value: 5 },
- { _id:"255,162,0",value: 7.5 },
+ { _id:"170,222,0",value:"3.5-4.0" },
+ { _id:"193,232,0",value:"4.0-4.5" },
+ { _id:"255,162,0",value: "7.0-7.5" },
  { _id:"255,255,255",value: "na" },
- { _id:"242,250,0",value: 6 },
- { _id:"255,136,0",value: 7.8 },
- { _id:"255,242,0",value: 6 },
- { _id:"255,187,0",value: 7.2 },
- { _id:"255,213,0",value: 6.7 },
- { _id:"216,240,0",value: 5.5 }
+ { _id:"242,250,0",value: "5.0-5.5" },
+ { _id:"255,136,0",value:"7.5-8.0" },
+ { _id:"255,242,0",value:"5.5-6-0" },
+ { _id:"255,187,0",value: "6.5-7.0" },
+ { _id:"255,213,0",value: "6.0-6.5" },
+ { _id:"216,240,0",value: "4.5-5.0" }
 ];
 
 
@@ -111,20 +111,20 @@ var eolica = [
 
 
 var geotermia = [
- { _id:"255,89,0",value:200 },
- { _id:"255,221,0",value:120 },
- { _id:"255,132,0",value:175 },
- { _id:"255,179,0",value:130 },
- { _id:"255,251,0",value:120 },
- { _id:"255,255,138",value:"0-25" },
- { _id:"255,145,0",value:170 },
- { _id:"255,115,0",value:180 },
- { _id:"255,162,0",value:150 },
- { _id:"255,208,0",value:125 },
- { _id:"255,191,0",value:130 },
- { _id:"255,102,0",value:200 },
+ { _id:"255,89,0",value:"211-220" },
+ { _id:"255,221,0",value:"121-130" },
+ { _id:"255,132,0",value:"181-190" },
+ { _id:"255,179,0",value:"151-160" },
+ { _id:"255,251,0",value:"101-110" },
+ { _id:"255,255,138",value:"48-50" },
+ { _id:"255,145,0",value:"171-180" },
+ { _id:"255,115,0",value:"191-200" },
+ { _id:"255,162,0",value:"161-170" },
+ { _id:"255,208,0",value:"131-140" },
+ { _id:"255,191,0",value:"141-150" },
+ { _id:"255,102,0",value:"201-210" },
  { _id:"255,255,255",value:"na" },
- { _id:"255,255,107",value:"0-25" }
+ { _id:"255,255,107",value:"51-54" }
 ];
 
 
@@ -136,5 +136,32 @@ var residuos = [
  { _id:"255,173,102",value:"351-1000" },
  { _id:"255,235,204",value:"1-100" }
 ];
+
+function arreglarBlancos() {
+	var a = db.potencial.find({ '_id':144 }).toArray()[0];
+	a.temperatura = "48-50";
+	db.potencial.update({ _id:144 },a);
+
+	var a = db.potencial.find({ '_id':326 }).toArray()[0];
+	a.temperatura = "51-54";
+	db.potencial.update({ _id:326 },a);
+
+	var a = db.potencial.find({ '_id':145 }).toArray()[0];
+	a.temperatura = "51-54";
+	db.potencial.update({ _id:145 },a);
+
+	var a = db.potencial.find({ '_id':63 }).toArray()[0];
+	a.temperatura = "51-54";
+	db.potencial.update({ _id:63 },a);
+
+	var a = db.potencial.find({ '_id':303 }).toArray()[0];
+	a.temperatura = "51-54";
+	a.irradiación = "4.5-5.0";
+	db.potencial.update({ _id:303 },a);
+
+	var a = db.potencial.find({ '_id':2 }).toArray()[0];
+	a.irradiación = "5.5-6.0";
+	db.potencial.update({ _id:2 }, a);
+}
 
 todos();

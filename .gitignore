@@ -23,3 +23,6 @@ data/vulnerabilidadYresiliencia/*.csv
 data/vulnerabilidadYresiliencia/*.zip
 data/energías/*.xls
 data/energías/*.csv
+data/CUARTO/anuarios/*.csv
+data/CUARTO/anuarios/*.zip
+data/CUARTO/anuarios/*/

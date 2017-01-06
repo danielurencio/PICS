@@ -19,7 +19,7 @@ var a = db1.potencial.find().toArray();
 
 for(var i in a) {
  for(var j in sun) {
-  if( a[i].cveSUN == sun[j]._id ) a[i].ciudad = sun[j].ciudad;
+  if( a[i]._id == sun[j]._id ) a[i].ciudad = sun[j].ciudad;
  }
 }
 
