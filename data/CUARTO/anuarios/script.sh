@@ -138,6 +138,37 @@ limpiar() {
  rm header;
 }
 
+arreglarParticulares() {
+ for i in CDMX.*.csv; do
+  sed -i '2,5d' $i;
+ done 
+
+ dobleLinea Hgo "Santiago Tulantepec" "de Lugo Guerrero"
+ dobleLinea Oax "Heroica Ciudad de Juchitán" "de Zaragoza"
+ dobleLinea Oax "Heroica Villa Tezoatlán de Segura" "de Oaxaca"
+
+for i in Oax.*.csv; do
+  num=$(cat $i | grep "y Luna, Cuna de la Independencia " -n | cut -d':' -f1);
+  sed -i "${num}d" $i;
+  sed -i "s/Heroica Villa Tezoatlán de Segura de Oaxaca/Heroica Villa Tezoatlán de Segura y Luna; Cuna de la Independencia de Oaxaca/g" $i
+done
+
+# for i in Hgo.*.csv; do
+#  num=$(cat $i | grep 'Santiago Tulantepec' -n | cut -d':' -f1);
+#  sed "${num}d" -i $i
+#  sed -i "s/de Lugo Guerrero/Santiago Tulantepec de Lugo Guerrero/g" $i;
+# done
+}
+
+dobleLinea() {
+ for i in ${1}.*.csv; do
+  num=$(cat $i | grep "${2}" -n | cut -d':' -f1);
+  sed "${num}d" -i ${i}
+  sed -i "s/${3}/${2} ${3}/g" $i;
+ done
+
+}
+
 importar() {
  for i in *.csv; do
   mongoimport -d PICS -c electricidad --type=csv --headerline $i
