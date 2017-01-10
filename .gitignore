@@ -26,5 +26,5 @@ data/energías/*.csv
 data/CUARTO/anuarios/*.csv
 data/CUARTO/anuarios/*.zip
 data/CUARTO/anuarios/*/
-data/CUARTO/espacio/*.zip
-data/CUARTO/espacio/*/
+data/CUARTO/espacios/*.zip
+data/CUARTO/espacios/*/
