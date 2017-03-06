@@ -9,6 +9,12 @@ data/consumoEléctrico/*.csv
 data/seguridad/*.csv
 data/finanzas/*.xlsx
 data/finanzas/*.csv
+data/finanzasIMCO/*.csv;
+data/finanzasIMCO/*.xlsx;
+data/inere/*.tif;
+data/inere/*.csv;
+data/inere/sunShape/
+data/seguridad/*.html
 data/proyecciones/Proyecciones_municipios_y_localidades
 data/proyecciones/proyecciones.zip
 data/proyecciones/*.csv
